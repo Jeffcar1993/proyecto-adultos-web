@@ -1,11 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { perfilSchema, PerfilFormValues } from "@/schemas/perfilSchema";
+import { perfilSchema } from "@/schema/perfilSchema";
+import type { PerfilFormValues } from "@/schema/perfilSchema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -38,7 +39,7 @@ export function FormularioPerfil() {
     });
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/perfiles`, formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/perfiles`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("¡Perfil creado con éxito!");
@@ -108,7 +109,7 @@ export function FormularioPerfil() {
         <FormField
           control={form.control}
           name="fotos"
-          render={({ field: { onChange, value, ...rest } }) => (
+          render={({ field: { onChange, ...rest } }) => (
             <FormItem>
               <FormLabel>Fotos (Máximo 5)</FormLabel>
               <FormControl>
