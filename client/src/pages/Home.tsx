@@ -1,14 +1,20 @@
 import { Link } from "react-router-dom";
 import { BadgeCheck, Sparkles, ShieldCheck, Search, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import bogotaImage from "@/img/bogota.jpeg";
+import medellinImage from "@/img/medellin.jpeg";
+import caliImage from "@/img/cali.jpeg";
+import barranquillaImage from "@/img/barranquilla.jpg";
+import cartagenaImage from "@/img/cartagena.jpg";
+import bucaramangaImage from "@/img/bucaramanga.jpeg";
 
 const cities = [
-  { name: "Bogotá", count: "+120 perfiles", image: "https://images.unsplash.com/photo-1624224496507-b8eddbd8867a?auto=format&fit=crop&w=600&q=80" },
-  { name: "Medellín", count: "+80 perfiles", image: "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=600&q=80" },
-  { name: "Cali", count: "+45 perfiles", image: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=600&q=80" },
-  { name: "Barranquilla", count: "+30 perfiles", image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" },
-  { name: "Cartagena", count: "+25 perfiles", image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" },
-  { name: "Bucaramanga", count: "+15 perfiles", image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" },
+  { name: "Bogotá", count: "+120 perfiles", image: bogotaImage },
+  { name: "Medellín", count: "+80 perfiles", image: medellinImage },
+  { name: "Cali", count: "+45 perfiles", image: caliImage },
+  { name: "Barranquilla", count: "+30 perfiles", image: barranquillaImage },
+  { name: "Cartagena", count: "+25 perfiles", image: cartagenaImage },
+  { name: "Bucaramanga", count: "+15 perfiles", image: bucaramangaImage },
 ];
 
 export function Home() {
