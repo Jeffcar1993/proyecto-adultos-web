@@ -32,7 +32,7 @@ export function Home() {
             </div>
             <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-zinc-950">
               ENCUENTRA <br />
-              <span className="text-red-600 italic">PLACER</span> REAL.
+              <span className="text-red-600 italic">PLACER</span> REAL
             </h1>
             <p className="text-xl text-zinc-600 max-w-lg leading-relaxed">
               La plataforma más discreta y profesional de Colombia. Perfiles 100% reales con contacto directo.
@@ -44,7 +44,7 @@ export function Home() {
                 <Link to="/explorar">Explorar Ahora</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="rounded-full px-8 h-14 text-lg border-zinc-300 bg-white hover:bg-zinc-50 cursor-pointer">
-                <Link to="/nuevo">Publicar Anuncio</Link>
+                <Link to="/crear-cuenta">Publicar Anuncio</Link>
               </Button>
             </div>
           </div>
