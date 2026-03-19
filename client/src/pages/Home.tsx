@@ -15,10 +15,12 @@ export function Home() {
   return (
     <div className="flex flex-col w-full bg-white text-zinc-900">
       
-      {/* HERO SECTION - Enfoque en Conversión */}
+          {/* HERO SECTION */}
       <section className="relative overflow-hidden bg-zinc-50 py-16 md:py-24 border-b">
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
+          
+          {/* COLUMNA IZQUIERDA - Contenido */}
+          <div className="relative z-10 space-y-8"> {/* Añadido z-10 para asegurar que esté arriba */}
             <div className="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-1.5 text-sm font-bold text-red-600 border border-red-100 uppercase tracking-widest">
               <Sparkles size={14} /> Contenido Verificado +18
             </div>
@@ -29,27 +31,30 @@ export function Home() {
             <p className="text-xl text-zinc-600 max-w-lg leading-relaxed">
               La plataforma más discreta y profesional de Colombia. Perfiles 100% reales con contacto directo.
             </p>
+            
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 h-14 text-lg font-bold shadow-lg shadow-blue-200">
-                Explorar Ahora
+              {/* IMPORTANTE: Usa asChild para que el cursor funcione correctamente con el Link */}
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 h-14 text-lg font-bold shadow-lg shadow-blue-200 cursor-pointer">
+                <Link to="/explorar">Explorar Ahora</Link>
               </Button>
-              <Button size="lg" variant="outline" className="rounded-full px-8 h-14 text-lg border-zinc-300">
-                Publicar Anuncio
+              <Button asChild size="lg" variant="outline" className="rounded-full px-8 h-14 text-lg border-zinc-300 bg-white hover:bg-zinc-50 cursor-pointer">
+                <Link to="/nuevo">Publicar Anuncio</Link>
               </Button>
             </div>
           </div>
           
-          {/* Elemento Visual Abstracto / Logo de Impacto */}
-          <div className="hidden lg:flex justify-center">
-             <div className="relative w-80 h-80 bg-red-600 rounded-[40px] rotate-6 flex items-center justify-center shadow-2xl overflow-hidden">
-               <img
-                src="/erotica.avif"
+          {/* COLUMNA DERECHA - Logo */}
+          <div className="hidden lg:flex justify-center relative">
+            {/* Quitamos el div absolute inset-0 que bloqueaba los clics */}
+            <div className="relative group transition-transform duration-500 hover:rotate-3">
+              <img
+                src="/logo.png"
                 alt="Erotica"
-                className="h-56 w-auto max-w-[75%] -rotate-6 object-contain"
-               />
-                <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors cursor-pointer" />
-             </div>
+                className="h-72 w-auto object-contain drop-shadow-2xl"
+              />
+            </div>
           </div>
+
         </div>
       </section>
 

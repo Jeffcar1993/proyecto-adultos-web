@@ -22,7 +22,7 @@ export function SiteFooter() {
           <div className="lg:col-span-5 space-y-8">
             <Link to="/" className="inline-block">
               <img
-                src="/erotica.avif"
+                src="/logo.png"
                 alt="Erotik"
                 className="h-24 w-auto object-contain"
               />

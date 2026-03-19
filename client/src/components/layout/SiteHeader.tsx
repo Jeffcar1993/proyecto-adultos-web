@@ -15,7 +15,7 @@ export function SiteHeader() {
           aria-label="Ir al inicio"
         >
           <img
-            src="/erotica.avif"
+            src="/logo.png"
             alt="Erotik Colombia"
             className="h-16 w-auto object-contain md:h-20 drop-shadow-sm"
           />
