@@ -1,15 +1,24 @@
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-* {
-  box-sizing: border-box;
+/* Si quieres mantener tus variables de color personalizadas, 
+  ponlas aquí, pero NO uses el selector * para resetear fuentes.
+*/
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  /* ... tus otras variables de shadcn ... */
 }
 
 body {
-  margin: 0;
-  background: #f8fafc;
-  color: #18181b;
-  font-family: "Geist Variable", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  @apply bg-white text-zinc-900;
+  font-family: 'Inter', sans-serif; /* O la que prefieras */
+}
+
+/* Solo estilos globales mínimos */
+html, body {
+  height: 100%;
+  scroll-behavior: smooth;
 }

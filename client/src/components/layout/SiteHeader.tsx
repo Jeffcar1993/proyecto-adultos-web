@@ -1,44 +1,52 @@
 import { Link } from "react-router-dom"
-import { Search } from "lucide-react"
-
+import { Search, UserCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-4 px-4 py-4 md:grid-cols-[auto,1fr,auto]">
-        <div className="order-2 flex items-center gap-2 md:order-1">
-          <Button asChild variant="outline" className="rounded-full px-5">
-            <Link to="/iniciar-sesion">Iniciar sesion</Link>
-          </Button>
-          <Button asChild className="rounded-full px-5">
-            <Link to="/crear-cuenta">Crear cuenta</Link>
-          </Button>
-        </div>
-
-        <form className="order-1 mx-auto flex w-full max-w-2xl items-center gap-2 md:order-2" role="search">
-          <Input
-            type="search"
-            aria-label="Buscar"
-            placeholder="Buscar ciudad, servicio o perfil..."
-            className="h-11 rounded-full border-zinc-300"
-          />
-          <Button type="submit" size="icon" className="h-11 w-11 rounded-full" aria-label="Buscar">
-            <Search className="h-5 w-5" />
-          </Button>
-        </form>
-
+    <header className="sticky top-0 z-50 w-full border-b border-zinc-100 bg-white/80 backdrop-blur-md">
+      <div className="mx-auto flex h-28 max-w-7xl items-center justify-between gap-8 px-6">
+        
+        {/* LOGO - Escalado para impacto visual */}
         <Link
           to="/"
-          className="order-3 ml-auto inline-flex items-center gap-3 rounded-full border border-zinc-200 px-4 py-2 transition hover:border-zinc-400"
+          className="flex items-center transition-transform hover:scale-105"
           aria-label="Ir al inicio"
         >
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-sm font-bold text-white">
-            EC
-          </span>
-          <span className="text-sm font-semibold tracking-wide text-zinc-900">EROTIK COLOMBIA</span>
+          <img
+            src="/erotica.avif"
+            alt="Erotik Colombia"
+            className="h-16 w-auto object-contain md:h-20 drop-shadow-sm"
+          />
         </Link>
+
+        {/* BUSCADOR - Minimalista */}
+        <form className="hidden max-w-md flex-1 items-center lg:flex" role="search">
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+            <Input
+              type="search"
+              placeholder="Buscar ciudad, servicio o perfil..."
+              className="h-12 w-full rounded-full border-zinc-200 bg-zinc-50 pl-11 pr-4 text-sm focus:bg-white focus:ring-2 focus:ring-blue-600/20"
+            />
+          </div>
+        </form>
+
+        {/* ACCIONES */}
+        <div className="flex items-center gap-3">
+          <Link to="/iniciar-sesion" className="hidden text-sm font-bold text-zinc-600 hover:text-zinc-900 md:block px-4">
+            Iniciar Sesión
+          </Link>
+          
+          <Button asChild className="h-12 rounded-full bg-blue-600 px-6 text-sm font-bold text-white shadow-lg shadow-blue-200 hover:bg-blue-700">
+            <Link to="/crear-cuenta">Publicar Anuncio</Link>
+          </Button>
+
+          <Link to="/iniciar-sesion" className="md:hidden text-zinc-600">
+            <UserCircle size={32} />
+          </Link>
+        </div>
       </div>
     </header>
   )
