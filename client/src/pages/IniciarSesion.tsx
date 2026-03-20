@@ -1,10 +1,92 @@
-export function IniciarSesion() {
+import { Link } from "react-router-dom";
+import { ShieldCheck, Lock, Mail, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+export function Login() {
   return (
-    <section className="mx-auto w-full max-w-2xl px-4 py-14">
-      <div className="rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-3 text-3xl font-bold text-zinc-900">Iniciar sesion</h1>
-        <p className="text-zinc-700">Esta pantalla estara disponible proximamente.</p>
+    <div className="flex h-[85vh] min-h-[600px] w-full bg-white overflow-hidden rounded-3xl shadow-2xl my-auto">
+      {/* LADO IZQUIERDO: Imagen e Impacto (Oculto en móvil) */}
+      <div className="relative hidden w-1/2 flex-col justify-between bg-zinc-950 p-12 text-white lg:w-[45%] lg:flex">
+        <div className="absolute inset-0 overflow-hidden">
+          <img 
+            src="https://images.unsplash.com/photo-1515462277126-2dd0c162007a?auto=format&fit=crop&w=1200&q=80" 
+            className="h-full w-full object-cover opacity-50 grayscale transition-transform duration-1000 hover:scale-105"
+            alt="Ambiente Erotik"
+          />
+          {/* El gradiente negro abajo es vital para que el texto sea legible */}
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+        </div>
+
+        <Link to="/" className="relative z-10 inline-block" aria-label="Ir al inicio">
+          <img src="/logo.png" alt="Erotik Colombia" className="h-16 w-auto object-contain drop-shadow-sm" />
+        </Link>
+
+        <div className="relative z-10 space-y-6">
+          <h2 className="text-5xl font-black leading-tight tracking-tighter">
+            TU PRIVACIDAD ES <br /> NUESTRA <span className="text-red-600">PRIORIDAD.</span>
+          </h2>
+          <div className="flex gap-4">
+            <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-400">
+              <ShieldCheck className="text-blue-500" size={18} /> Perfiles Verificados
+            </div>
+            <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-400">
+              <Lock className="text-blue-500" size={18} /> Datos Encriptados
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
-  )
+
+      {/* LADO DERECHO: Formulario */}
+      <div className="flex w-full flex-col justify-center px-6 py-12 lg:w-[55%] lg:px-24">
+        <div className="mx-auto w-full max-w-md space-y-8">
+          <div className="space-y-2">
+            <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold text-red-500 hover:text-zinc-900 transition-colors mb-4">
+              <ArrowLeft size={16} /> Volver al inicio
+            </Link>
+            <h1 className="text-4xl font-black tracking-tighter text-red-900 uppercase">Bienvenido de nuevo</h1>
+            <p className="text-zinc-500">Ingresa tus credenciales para gestionar tu perfil.</p>
+          </div>
+
+          <form className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-zinc-400">Correo Electrónico</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                <Input 
+                  type="email" 
+                  placeholder="ejemplo@correo.com" 
+                  className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 focus:ring-blue-600/20"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <label className="text-xs font-black uppercase tracking-widest text-zinc-400">Contraseña</label>
+                <Link to="/recuperar" className="text-xs font-bold text-blue-600 hover:underline">¿Olvidaste tu contraseña?</Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                <Input 
+                  type="password" 
+                  placeholder="••••••••" 
+                  className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 focus:ring-blue-600/20"
+                />
+              </div>
+            </div>
+
+            <Button className="text-white w-full h-12 rounded-xl bg-blue-600 text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
+              Iniciar Sesión
+            </Button>
+          </form>
+
+          <p className="text-center text-sm text-zinc-500">
+            ¿No tienes una cuenta?{" "}
+            <Link to="/crear-cuenta" className="font-bold text-red-600 hover:underline">Regístrate gratis</Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }

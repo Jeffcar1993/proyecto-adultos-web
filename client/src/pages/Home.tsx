@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { BadgeCheck, Sparkles, ShieldCheck, Search, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import bogotaImage from "@/img/bogota.jpeg";
@@ -18,8 +19,40 @@ const cities = [
 ];
 
 export function Home() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Erotik Colombia",
+    url: "https://erotikcolombia.com",
+    description:
+      "La plataforma más discreta y segura de anuncios para adultos en Colombia. Perfiles 100% verificados.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://erotikcolombia.com/explorar?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <div className="flex flex-col w-full bg-white text-zinc-900">
+      <Helmet>
+        <title>Erotik Colombia | Anuncios para Adultos Verificados</title>
+        <meta
+          name="description"
+          content="La plataforma más discreta y segura de anuncios para adultos en Colombia. Perfiles 100% verificados en Bogotá, Medellín, Cali y más ciudades."
+        />
+        <link rel="canonical" href="https://erotikcolombia.com/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Erotik Colombia | Anuncios para Adultos Verificados" />
+        <meta
+          property="og:description"
+          content="La plataforma más discreta y segura de anuncios para adultos en Colombia. Perfiles 100% verificados en Bogotá, Medellín, Cali y más ciudades."
+        />
+        <meta property="og:url" content="https://erotikcolombia.com/" />
+        <meta property="og:image" content="https://erotikcolombia.com/logo.png" />
+        <meta property="og:locale" content="es_CO" />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
       
           {/* HERO SECTION */}
       <section className="relative overflow-hidden bg-zinc-50 py-16 md:py-24 border-b">
@@ -103,7 +136,7 @@ export function Home() {
               <ShieldCheck size={32} />
             </div>
             <h3 className="text-xl font-bold">Privacidad Absoluta</h3>
-            <p className="text-zinc-400">Tus datos y búsquedas están protegidos con encriptación de grado militar.</p>
+            <p className="text-zinc-400">Tus datos y búsquedas están protegidos y encriptados.</p>
           </div>
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="h-16 w-16 bg-green-600/20 rounded-2xl flex items-center justify-center text-green-500">

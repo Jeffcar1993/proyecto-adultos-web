@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Bloquear rutas privadas
+Disallow: /nuevo
+Disallow: /crear-cuenta
+Disallow: /iniciar-sesion
+
+Sitemap: https://erotikcolombia.com/sitemap.xml

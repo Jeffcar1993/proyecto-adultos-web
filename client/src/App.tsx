@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/layout/SiteFooter"
 import { SiteHeader } from "@/components/layout/SiteHeader"
 import { CrearCuenta } from "@/pages/CrearCuenta"
 import { Home } from "@/pages/Home"
-import { IniciarSesion } from "@/pages/IniciarSesion"
+import { Login } from "@/pages/IniciarSesion"
 import { CondicionesUso } from "@/pages/CondicionesUso"
 import { ContactoPage } from "@/pages/ContactoPage"
 import { ControlParental } from "@/pages/ControlParental"
@@ -35,7 +35,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/nuevo" element={<FormularioPerfil />} />
-            <Route path="/iniciar-sesion" element={<IniciarSesion />} />
+            <Route path="/iniciar-sesion" element={<Login />} />
             <Route path="/crear-cuenta" element={<CrearCuenta />} />
             <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
             <Route path="/condiciones-uso" element={<CondicionesUso />} />
