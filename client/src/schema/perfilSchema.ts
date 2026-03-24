@@ -6,6 +6,8 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/web
 export const perfilSchema = z.object({
   nombre: z.string().min(3, "Mínimo 3 caracteres"),
   descripcion: z.string().max(500, "Máximo 500 caracteres"),
+  ciudad: z.string().min(1, "La ciudad es obligatoria"), // Añadido
+  barrio: z.string().min(1, "El sector o barrio es obligatorio"), // Añadido
   telefono: z.string().min(7, "Teléfono inválido"),
   whatsapp: z.string().min(7, "WhatsApp inválido"),
   fotos: z

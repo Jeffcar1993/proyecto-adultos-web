@@ -4,33 +4,25 @@ import { uploadToCloudinary } from '../config/cloudinary.ts';
 
 export const createPerfil = async (req: Request, res: Response) => {
   try {
-    const { nombre, descripcion, telefono, whatsapp } = req.body;
+    // 1. Extraer los nuevos campos del body
+    const { nombre, descripcion, telefono, whatsapp, ciudad, barrio } = req.body;
     const files = req.files as Express.Multer.File[];
 
-    // 1. Validar que existan archivos
     if (!files || files.length === 0) {
       return res.status(400).json({ message: "Debes subir al menos una foto." });
     }
 
-    if (files.length > 5) {
-      return res.status(400).json({ message: "El máximo de fotos permitido es 5." });
-    }
-
-    // 2. Subir imágenes a Cloudinary en paralelo para mayor velocidad
+    // 2. Subida a Cloudinary (Tu lógica actual es perfecta)
     const uploadPromises = files.map(file => 
       uploadToCloudinary(file.buffer, 'perfiles_adultos')
     );
-    
     const photosUrls = await Promise.all(uploadPromises);
-
-    // 3. Definir foto principal (por defecto la primera del array)
-    // En el futuro, el frontend podría enviar un índice para elegirla
     const foto_principal = photosUrls[0];
 
-    // 4. Insertar en Neon (PostgreSQL)
+    // 3. Query actualizado con las nuevas columnas de Neon
     const query = `
-      INSERT INTO perfiles (nombre, descripcion, telefono, whatsapp, fotos, foto_principal)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO perfiles (nombre, descripcion, telefono, whatsapp, ciudad, barrio, fotos, foto_principal)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *;
     `;
 
@@ -39,7 +31,9 @@ export const createPerfil = async (req: Request, res: Response) => {
       descripcion, 
       telefono, 
       whatsapp, 
-      photosUrls, // El driver 'pg' convierte el array de JS a ARRAY de Postgres automáticamente
+      ciudad,   // $5
+      barrio,   // $6
+      photosUrls, 
       foto_principal
     ];
 
