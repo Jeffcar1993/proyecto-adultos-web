@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import pool from './config/db.ts';
+import { migratePerfil } from './config/migrations.ts';
 import perfilRoutes from './routes/perfil.routes.ts';
 
 const app = express();
@@ -21,6 +22,12 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+app.listen(PORT, async () => {
+  try {
+    await migratePerfil();
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  } catch (error) {
+    console.error("Error iniciando servidor:", error);
+    process.exit(1);
+  }
 });

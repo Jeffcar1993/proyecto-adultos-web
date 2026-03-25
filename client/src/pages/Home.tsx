@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { BadgeCheck, Sparkles, ShieldCheck, Search, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,24 @@ const cities = [
 ];
 
 export function Home() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const showPublishedMessage =
+    (location.state as { anuncioPublicado?: boolean } | null)?.anuncioPublicado === true;
+
+  useEffect(() => {
+    if (!showPublishedMessage) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      // Limpiamos el state para que el mensaje no reaparezca al recargar.
+      navigate(location.pathname, { replace: true, state: null });
+    }, 3000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [showPublishedMessage, navigate, location.pathname]);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -53,6 +72,15 @@ export function Home() {
         <meta property="og:locale" content="es_CO" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
+
+      {showPublishedMessage && (
+        <div className="container mx-auto px-4 pt-6">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 shadow-sm">
+            <p className="text-sm font-bold uppercase tracking-wider">Anuncio publicado correctamente</p>
+            <p className="mt-1 text-sm text-emerald-700">Tu perfil ya fue enviado y se procesó con éxito.</p>
+          </div>
+        </div>
+      )}
       
           {/* HERO SECTION */}
       <section className="relative overflow-hidden bg-zinc-50 py-16 md:py-24 border-b">
@@ -109,8 +137,16 @@ export function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {cities.map((city) => (
-            <Link to={`/ciudad/${city.name.toLowerCase()}`} key={city.name} className="group relative h-[400px] overflow-hidden rounded-3xl bg-zinc-200">
-              <img src={city.image} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" alt={city.name} />
+            <Link
+              to={`/explorar?ciudad=${encodeURIComponent(city.name)}`}
+              key={city.name}
+              className="group relative h-[400px] overflow-hidden rounded-3xl bg-zinc-200"
+            >
+              <img
+                src={city.image}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                alt={city.name}
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
               <div className="absolute bottom-8 left-8">
                 <p className="text-red-500 font-bold text-sm uppercase tracking-widest">{city.count}</p>

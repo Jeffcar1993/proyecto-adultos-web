@@ -2,8 +2,26 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom"; // Importar
 
 export function CrearCuenta() {
+  const navigate = useNavigate(); // Inicializar
+
+  const handleRegistro = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Aquí iría tu lógica de axios.post('/auth/register', ...)
+    try {
+      // Supongamos que el registro es exitoso:
+      console.log("Cuenta creada");
+      
+      // REDIRECCIÓN AL FORMULARIO DE PERFIL
+      navigate("/nuevo"); 
+    } catch {
+      console.error("Error al crear cuenta");
+    }
+  };
+  
   return (
     <div className="flex min-h-[90vh] w-full bg-white lg:p-4">
       <div className="mx-auto flex w-full max-w-[1400px] overflow-hidden lg:rounded-3xl lg:border lg:border-zinc-100 lg:shadow-2xl">
@@ -42,7 +60,7 @@ export function CrearCuenta() {
               <h1 className="text-4xl font-black tracking-tighter text-zinc-900 uppercase">Crea tu cuenta</h1>
             </div>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleRegistro}>
 
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Nombre Completo</label>
@@ -59,7 +77,7 @@ export function CrearCuenta() {
                 <Input type="password" placeholder="••••••••" className="h-12 rounded-xl border-zinc-200 bg-zinc-50 focus:ring-blue-600/10" />
               </div>
 
-              <Button className="text-white w-full h-14 rounded-xl bg-blue-600 text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
+              <Button type="submit" className="text-white w-full h-14 rounded-xl bg-blue-600 text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
                 Crear Mi Cuenta
               </Button>
             </form>

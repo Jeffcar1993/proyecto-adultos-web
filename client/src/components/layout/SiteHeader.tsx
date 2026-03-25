@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
-import { Search, UserCircle } from "lucide-react"
+import { UserCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { SearchHeader } from "@/components/SearchHeader"
 
 export function SiteHeader() {
   return (
@@ -21,17 +21,8 @@ export function SiteHeader() {
           />
         </Link>
 
-        {/* BUSCADOR - Minimalista */}
-        <form className="hidden max-w-md flex-1 items-center lg:flex" role="search">
-          <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-            <Input
-              type="search"
-              placeholder="Buscar ciudad, servicio o perfil..."
-              className="h-12 w-full rounded-full border-zinc-200 bg-zinc-50 pl-11 pr-4 text-sm focus:bg-white focus:ring-2 focus:ring-blue-600/20"
-            />
-          </div>
-        </form>
+        {/* BUSCADOR - Con autocompletado */}
+        <SearchHeader />
 
         {/* ACCIONES */}
         <div className="flex items-center gap-3">
@@ -40,7 +31,7 @@ export function SiteHeader() {
           </Link>
           
           <Button asChild className="h-12 rounded-full bg-blue-600 px-6 text-sm font-bold text-white shadow-lg shadow-blue-200 hover:bg-blue-700">
-            <Link to="/crear-cuenta">Publicar Anuncio</Link>
+            <Link to="/crear-cuenta">Crear Cuenta</Link>
           </Button>
 
           <Link to="/iniciar-sesion" className="md:hidden text-zinc-600">

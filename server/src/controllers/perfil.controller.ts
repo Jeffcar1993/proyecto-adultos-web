@@ -4,36 +4,37 @@ import { uploadToCloudinary } from '../config/cloudinary.ts';
 
 export const createPerfil = async (req: Request, res: Response) => {
   try {
-    // 1. Extraer los nuevos campos del body
-    const { nombre, descripcion, telefono, whatsapp, ciudad, barrio } = req.body;
+    // Extraer campos del body
+    const { nombre, descripcion, telefono, whatsapp, departamento, ciudad, barrio } = req.body;
     const files = req.files as Express.Multer.File[];
 
     if (!files || files.length === 0) {
       return res.status(400).json({ message: "Debes subir al menos una foto." });
     }
 
-    // 2. Subida a Cloudinary (Tu lógica actual es perfecta)
+    // Subida a Cloudinary
     const uploadPromises = files.map(file => 
       uploadToCloudinary(file.buffer, 'perfiles_adultos')
     );
     const photosUrls = await Promise.all(uploadPromises);
     const foto_principal = photosUrls[0];
 
-    // 3. Query actualizado con las nuevas columnas de Neon
+    // Query actualizado con departamento y barrio
     const query = `
-      INSERT INTO perfiles (nombre, descripcion, telefono, whatsapp, ciudad, barrio, fotos, foto_principal)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO perfiles (nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp, fotos, foto_principal)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *;
     `;
 
     const values = [
-      nombre, 
-      descripcion, 
-      telefono, 
-      whatsapp, 
-      ciudad,   // $5
-      barrio,   // $6
-      photosUrls, 
+      nombre,
+      descripcion,
+      departamento,
+      ciudad,
+      barrio || null,
+      telefono,
+      whatsapp,
+      photosUrls,
       foto_principal
     ];
 
@@ -52,12 +53,50 @@ export const createPerfil = async (req: Request, res: Response) => {
 
 export const getPerfiles = async (req: Request, res: Response) => {
   try {
-    // Solo traemos lo necesario para la vista miniatura
-    const result = await pool.query(
-      'SELECT id, nombre, foto_principal, telefono, whatsapp FROM perfiles ORDER BY created_at DESC'
-    );
+    const { departamento, ciudad, barrio, q } = req.query;
+
+    // Construir WHERE dinámico
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+    let paramIndex = 1;
+
+    if (departamento && typeof departamento === 'string') {
+      conditions.push(`departamento = $${paramIndex}`);
+      params.push(departamento);
+      paramIndex++;
+    }
+
+    if (ciudad && typeof ciudad === 'string') {
+      conditions.push(`ciudad = $${paramIndex}`);
+      params.push(ciudad);
+      paramIndex++;
+    }
+
+    if (barrio && typeof barrio === 'string') {
+      conditions.push(`barrio ILIKE $${paramIndex}`);
+      params.push(`%${barrio}%`);
+      paramIndex++;
+    }
+
+    if (q && typeof q === 'string') {
+      conditions.push(`nombre ILIKE $${paramIndex}`);
+      params.push(`%${q}%`);
+      paramIndex++;
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const query = `
+      SELECT id, nombre, foto_principal, telefono, whatsapp, ciudad, barrio, departamento
+      FROM perfiles
+      ${whereClause}
+      ORDER BY created_at DESC
+    `;
+
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
+    console.error("Error en getPerfiles:", error);
     res.status(500).json({ message: "Error al obtener perfiles" });
   }
 };
