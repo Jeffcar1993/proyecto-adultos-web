@@ -2,23 +2,41 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom"; // Importar
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/useAuth";
+import { useState } from "react";
+import axios from "axios";
 
 export function CrearCuenta() {
   const navigate = useNavigate(); // Inicializar
+  const { login } = useAuth(); // Obtener función de login del contexto de autenticación
+
+  // Estados para el formulario
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleRegistro = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    // Aquí iría tu lógica de axios.post('/auth/register', ...)
     try {
-      // Supongamos que el registro es exitoso:
-      console.log("Cuenta creada");
-      
-      // REDIRECCIÓN AL FORMULARIO DE PERFIL
-      navigate("/nuevo"); 
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/register`, {
+        email,
+        password
+      });
+
+      // Si el registro te loguea automáticamente (recomendado)
+      if (response.data.token) {
+        login(response.data.token, response.data.user);
+        navigate("/nuevo"); // Ir al formulario de perfil
+      } else {
+        navigate("/iniciar-sesion"); // O ir al login si prefieres
+      }
     } catch {
-      console.error("Error al crear cuenta");
+      alert("Error al crear cuenta. El correo podría estar en uso.");
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -69,16 +87,16 @@ export function CrearCuenta() {
 
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Correo Electrónico</label>
-                <Input type="email" placeholder="ejemplo@correo.com" className="h-12 rounded-xl border-zinc-200 bg-zinc-50 focus:ring-blue-600/10" />
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="ejemplo@correo.com" className="h-12 rounded-xl border-zinc-200 bg-zinc-50 focus:ring-blue-600/10" />
               </div>
 
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Contraseña</label>
-                <Input type="password" placeholder="••••••••" className="h-12 rounded-xl border-zinc-200 bg-zinc-50 focus:ring-blue-600/10" />
+                <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" className="h-12 rounded-xl border-zinc-200 bg-zinc-50 focus:ring-blue-600/10" />
               </div>
 
-              <Button type="submit" className="text-white w-full h-14 rounded-xl bg-blue-600 text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
-                Crear Mi Cuenta
+              <Button type="submit" disabled={loading} className="text-white w-full h-14 rounded-xl bg-blue-600 text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
+                {loading ? "Creando cuenta..." : "Crear Mi Cuenta"}
               </Button>
             </form>
 

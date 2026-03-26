@@ -22,12 +22,23 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
-app.listen(PORT, async () => {
-  try {
-    await migratePerfil();
-    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  } catch (error) {
-    console.error("Error iniciando servidor:", error);
-    process.exit(1);
-  }
+// Iniciar servidor
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`   Prueba la conexión en: http://localhost:${PORT}/test-db`);
+});
+
+// Intentar migración con manejo de errores
+migratePerfil()
+  .then(() => {
+    console.log('✅ Migración completada');
+  })
+  .catch((error) => {
+    console.error('⚠️ Error en migración (continuando):', error.message);
+    console.error('⚠️ Verifica tu conexión a Neon en: http://localhost:' + PORT + '/test-db');
+  });
+
+// Manejo de errores no capturados
+process.on('unhandledRejection', (err) => {
+  console.error('❌ Error no manejado:', err);
 });

@@ -1,13 +1,20 @@
 import { Router } from 'express';
-import { createPerfil, getPerfilById, getPerfiles } from '../controllers/perfil.controller.ts';
+import { crearPerfil, getPerfilById, getPerfiles } from '../controllers/perfil.controller.ts';
 import { upload } from '../middlewares/multer.ts';
+import { login, register } from '../controllers/authController.ts';
+import { authenticateToken } from '../middlewares/authMiddleware.ts';
 
 const router = Router();
 
-// 'fotos' es el nombre del campo que deberá enviar el frontend
-router.post('/', upload.array('fotos', 5), createPerfil);
+// Rutas de autenticación (sin protección)
+router.post('/register', register);
+router.post('/login', login);
 
+// Rutas de perfiles públicas
 router.get('/', getPerfiles);
 router.get('/:id', getPerfilById);
+
+// Rutas de perfiles protegidas (requieren autenticación)
+router.post('/', authenticateToken, upload.array('fotos', 5), crearPerfil);
 
 export default router;

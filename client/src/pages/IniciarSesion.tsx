@@ -1,9 +1,38 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, } from "react-router-dom";
 import { ShieldCheck, Lock, Mail, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/context/useAuth";
+import { useState } from "react";
+import axios from "axios";
+
 
 export function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
+        email,
+        password
+      });
+
+      login(response.data.token, response.data.user);
+      
+      navigate("/nuevo");
+    } catch {
+      alert("Credenciales incorrectas");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   return (
     <div className="flex h-[85vh] min-h-[600px] w-full bg-white overflow-hidden rounded-3xl shadow-2xl my-auto">
       {/* LADO IZQUIERDO: Imagen e Impacto (Oculto en móvil) */}
@@ -48,13 +77,16 @@ export function Login() {
             <p className="text-zinc-500">Ingresa tus credenciales para gestionar tu perfil.</p>
           </div>
 
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-2">
               <label className="text-xs font-black uppercase tracking-widest text-zinc-400">Correo Electrónico</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
                 <Input 
                   type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
                   placeholder="ejemplo@correo.com" 
                   className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 focus:ring-blue-600/20"
                 />
@@ -70,14 +102,17 @@ export function Login() {
                 <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
                 <Input 
                   type="password" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  required 
                   placeholder="••••••••" 
                   className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 focus:ring-blue-600/20"
                 />
               </div>
             </div>
 
-            <Button className="text-white w-full h-12 rounded-xl bg-blue-600 text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
-              Iniciar Sesión
+            <Button type="submit" disabled={loading} className="text-white w-full h-12 rounded-xl bg-blue-600 text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
+              {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </Button>
           </form>
 
