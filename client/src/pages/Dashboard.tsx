@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/useAuth";
 import axios from "axios";
 import { 
-  MapPin, Smartphone, Edit3, Eye, 
+  MapPin, Smartphone, Eye, 
   ExternalLink, Plus, Loader2, Camera 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -110,13 +110,7 @@ export function Dashboard() {
                 </div>
 
                 {/* BOTONES DE ACCIÓN */}
-                <div className="grid grid-cols-2 gap-4 mt-10">
-                  <Button 
-                    onClick={() => navigate(`/editar-perfil/${perfil.id}`)}
-                    className="h-14 rounded-2xl bg-zinc-900 hover:bg-black text-white font-bold uppercase tracking-widest text-xs"
-                  >
-                    <Edit3 size={16} className="mr-2" /> Editar Información
-                  </Button>
+                <div className="grid grid-cols-1 gap-4 mt-10">
                   <Button 
                     variant="outline"
                     className="h-14 rounded-2xl border-2 border-zinc-100 font-bold uppercase tracking-widest text-xs hover:bg-zinc-50"

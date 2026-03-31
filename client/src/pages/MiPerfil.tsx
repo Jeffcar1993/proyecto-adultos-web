@@ -97,7 +97,7 @@ export function MiPerfil() {
 
         <div className="mt-10">
           <h2 className="text-xl font-black tracking-tight text-zinc-900">Mis anuncios</h2>
-          <p className="mt-1 text-sm text-zinc-500">Administra los anuncios que ya has publicado.</p>
+          <p className="mt-1 text-sm text-zinc-500">Estos son los anuncios que ya has publicado.</p>
 
           {loading ? (
             <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
@@ -122,14 +122,6 @@ export function MiPerfil() {
                       <p className="text-sm text-zinc-500">{anuncio.ciudad}, {anuncio.departamento}</p>
                     </div>
                   </div>
-
-                  <Button
-                    onClick={() => navigate(`/editar-perfil/${anuncio.id}`)}
-                    variant="outline"
-                    className="h-10 rounded-xl border-zinc-300 px-5 font-bold"
-                  >
-                    Editar
-                  </Button>
                 </div>
               ))}
             </div>

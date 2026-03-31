@@ -11,7 +11,6 @@ import { Home } from "@/pages/Home"
 import { Explorar } from "@/pages/Explorar"
 import { Login } from "@/pages/IniciarSesion"
 import { MiPerfil } from "@/pages/MiPerfil"
-import { EditarPerfil } from "@/pages/EditarPerfil"
 import { CondicionesUso } from "@/pages/CondicionesUso"
 import { ContactoPage } from "@/pages/ContactoPage"
 import { ControlParental } from "@/pages/ControlParental"
@@ -42,7 +41,6 @@ function App() {
             <Route path="/explorar" element={<Explorar />} />
             <Route path="/mi-perfil" element={<ProtectedRoute><MiPerfil /></ProtectedRoute>} />
             <Route path="/nuevo" element={<ProtectedRoute><FormularioPerfil /></ProtectedRoute>} />
-            <Route path="/editar-perfil/:id" element={<ProtectedRoute><EditarPerfil /></ProtectedRoute>} />
             <Route path="/iniciar-sesion" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
             <Route path="/crear-cuenta" element={<PublicOnlyRoute><CrearCuenta /></PublicOnlyRoute>} />
             <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
