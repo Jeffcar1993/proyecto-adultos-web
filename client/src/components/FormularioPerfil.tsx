@@ -18,7 +18,7 @@ export function FormularioPerfil() {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const [photoItems, setPhotoItems] = useState<{ file: File; url: string }[]>([]);
   const [ciudadesDisponibles, setCiudadesDisponibles] = useState<string[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -33,6 +33,7 @@ export function FormularioPerfil() {
       barrio: "",
       telefono: "",
       whatsapp: "",
+      edad: undefined,
       fotos: undefined,
     },
   });
@@ -51,17 +52,32 @@ export function FormularioPerfil() {
     }
   }, [departamentoElegido, form]);
 
-  // Manejador de previsualización de fotos
   const handleImageChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     onChange: (files: FileList | null) => void
   ) => {
-    const files = e.target.files;
-    if (files) {
-      const newPreviews = Array.from(files).map((file) => URL.createObjectURL(file));
-      setPreviews(newPreviews);
-      onChange(files);
-    }
+    const newFiles = e.target.files;
+    if (!newFiles || newFiles.length === 0) return;
+    const available = 5 - photoItems.length;
+    const toAdd = Array.from(newFiles).slice(0, available).map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+    const updated = [...photoItems, ...toAdd];
+    setPhotoItems(updated);
+    const dt = new DataTransfer();
+    updated.forEach((item) => dt.items.add(item.file));
+    onChange(dt.files);
+    e.target.value = "";
+  };
+
+  const removePhoto = (index: number, onChange: (files: FileList | null) => void) => {
+    URL.revokeObjectURL(photoItems[index].url);
+    const updated = photoItems.filter((_, i) => i !== index);
+    setPhotoItems(updated);
+    const dt = new DataTransfer();
+    updated.forEach((item) => dt.items.add(item.file));
+    onChange(dt.files.length > 0 ? dt.files : null);
   };
 
   async function onSubmit(values: Record<string, unknown>) {
@@ -99,7 +115,8 @@ export function FormularioPerfil() {
         },
       });
       
-      setPreviews([]);
+      photoItems.forEach((item) => URL.revokeObjectURL(item.url));
+      setPhotoItems([]);
       form.reset();
       navigate("/mi-perfil");
     } catch (error) {
@@ -109,6 +126,8 @@ export function FormularioPerfil() {
           setSubmitError("Tu sesión expiró o no es válida. Inicia sesión nuevamente.");
         } else if (error.response?.status === 400) {
           setSubmitError((error.response.data as { error?: string })?.error ?? "Datos incompletos para publicar el anuncio.");
+        } else if (error.response?.status === 409) {
+          setSubmitError((error.response.data as { error?: string })?.error ?? "Ya tienes un perfil publicado con esta cuenta.");
         } else {
           setSubmitError("No se pudo publicar el anuncio. Revisa los datos e inténtalo de nuevo.");
         }
@@ -150,6 +169,30 @@ export function FormularioPerfil() {
                       className="rounded-xl bg-zinc-50 border-none h-12 focus:ring-2 focus:ring-blue-600/10"
                       placeholder="Ej. Valentina"
                       {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="edad"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold">Edad</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={18}
+                      max={99}
+                      className="rounded-xl bg-zinc-50 border-none h-12 focus:ring-2 focus:ring-blue-600/10"
+                      placeholder="Ej. 25"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -323,34 +366,37 @@ export function FormularioPerfil() {
               render={({ field: { onChange, name, onBlur, ref } }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                      <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 rounded-2xl hover:border-red-500 hover:bg-zinc-900 transition-all cursor-pointer group">
-                        <Camera size={24} className="text-zinc-600 mb-2 group-hover:text-red-500" />
-                        <span className="text-[10px] font-bold text-zinc-500 uppercase">Subir</span>
-                        <input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          className="hidden"
-                          name={name}
-                          onBlur={onBlur}
-                          ref={ref}
-                          onChange={(e) => handleImageChange(e, onChange)}
-                        />
-                      </label>
-
-                      {previews.map((url, i) => (
-                        <div key={i} className="relative aspect-square rounded-2xl overflow-hidden border border-zinc-800 group">
-                          <img src={url} alt="Preview" className="w-full h-full object-cover" />
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                      {photoItems.map((item, i) => (
+                        <div key={item.url} className="relative aspect-square rounded-2xl overflow-hidden border border-zinc-800 group">
+                          <img src={item.url} alt="Preview" className="w-full h-full object-cover" />
                           <button
                             type="button"
-                            onClick={() => setPreviews((p) => p.filter((_, idx) => idx !== i))}
+                            onClick={() => removePhoto(i, onChange)}
                             className="absolute top-2 right-2 bg-black/60 p-1.5 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                           >
                             <X size={12} />
                           </button>
                         </div>
                       ))}
+                      {photoItems.length < 5 && (
+                        <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 rounded-2xl hover:border-red-500 hover:bg-zinc-900 transition-all cursor-pointer group">
+                          <Camera size={24} className="text-zinc-600 mb-2 group-hover:text-red-500" />
+                          <span className="text-[10px] font-bold text-zinc-500 uppercase">
+                            {photoItems.length === 0 ? "Subir" : `+Añadir`}
+                          </span>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            className="hidden"
+                            name={name}
+                            onBlur={onBlur}
+                            ref={ref}
+                            onChange={(e) => handleImageChange(e, onChange)}
+                          />
+                        </label>
+                      )}
                     </div>
                   </FormControl>
                   <FormMessage className="text-red-400" />

@@ -4,10 +4,14 @@ import { uploadToCloudinary } from '../config/cloudinary.ts';
 import type { AuthRequest } from '../middlewares/authMiddleware.ts';
 
 export const crearPerfil = async (req: AuthRequest, res: Response) => {
-  const { nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp } = req.body;
+  const { nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp, edad } = req.body;
   const usuario_id = req.userId; // Obtenido del Token
 
   try {
+    if (!usuario_id) {
+      return res.status(401).json({ error: 'No autenticado.' });
+    }
+
     const files = (req.files as Express.Multer.File[] | undefined) ?? [];
 
     if (!files.length) {
@@ -21,18 +25,30 @@ export const crearPerfil = async (req: AuthRequest, res: Response) => {
 
     const query = `
       INSERT INTO perfiles 
-      (nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp, usuario_id, fotos, foto_principal)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      (nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp, edad, usuario_id, fotos, foto_principal)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *;
     `;
 
     const result = await pool.query(query, [
-      nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp, 
+      nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp,
+      edad ? parseInt(edad) : null,
       usuario_id, fotosUrls, fotoPrincipal
     ]);
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      error.code === '23505'
+    ) {
+      return res.status(409).json({
+        error: 'La base de datos todavía tiene activa la restricción de un anuncio por usuario. Reinicia el backend o elimina unique_usuario_perfil en Neon.'
+      });
+    }
+
     console.error(error);
     res.status(500).json({ error: "Error al crear el perfil" });
   }

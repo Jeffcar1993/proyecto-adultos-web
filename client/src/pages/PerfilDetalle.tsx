@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeft, Loader2, MapPin, MessageCircle, Phone } from "lucide-react";
+import { ArrowLeft, ImageIcon, Loader2, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PerfilDetalleData {
@@ -108,31 +108,48 @@ export function PerfilDetalle() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <div className="flex flex-col gap-3">
-          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 shadow-sm">
-            <img
-              src={selectedImage ?? "/placeholder-user.png"}
-              alt={perfil.nombre}
-              className="h-[320px] w-full object-cover object-top md:h-[380px]"
-            />
-          </div>
+        <div className="space-y-4">
+          <div className="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-[0_24px_60px_-24px_rgba(15,23,42,0.28)]">
+            <div className="grid gap-3 p-3 md:p-4 lg:grid-cols-[minmax(0,1fr)_150px] xl:grid-cols-[minmax(0,1fr)_170px]">
+              <div className="relative overflow-hidden rounded-[1.5rem] bg-[radial-gradient(circle_at_top,_rgba(96,165,250,0.2),_transparent_42%),linear-gradient(180deg,_#f8fafc_0%,_#e5e7eb_100%)]">
+                <div className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full bg-black/65 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                  <ImageIcon size={14} />
+                  {fotos.length} foto{fotos.length === 1 ? "" : "s"}
+                </div>
+                <img
+                  src={selectedImage ?? "/placeholder-user.png"}
+                  alt={perfil.nombre}
+                  className="h-[360px] w-full object-contain p-3 md:h-[460px] md:p-4 lg:h-[540px]"
+                />
+              </div>
 
-          {fotos.length > 1 && (
-            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(fotos.length, 5)}, 1fr)` }}>
-              {fotos.map((foto) => (
-                <button
-                  key={foto}
-                  type="button"
-                  className={`overflow-hidden rounded-xl border transition ${
-                    selectedImage === foto ? "border-blue-600 ring-2 ring-blue-400" : "border-zinc-200 hover:border-zinc-400"
-                  }`}
-                  onClick={() => setSelectedImage(foto)}
-                >
-                  <img src={foto} alt={`Foto de ${perfil.nombre}`} className="h-16 w-full object-cover object-top" />
-                </button>
-              ))}
+              {fotos.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-1 lg:max-h-[540px] lg:flex-col lg:overflow-y-auto lg:overflow-x-visible">
+                  {fotos.map((foto, index) => (
+                    <button
+                      key={foto}
+                      type="button"
+                      className={`group relative min-w-[86px] overflow-hidden rounded-2xl border bg-zinc-100 transition duration-200 lg:min-w-0 ${
+                        selectedImage === foto
+                          ? "border-blue-600 ring-2 ring-blue-300 shadow-lg shadow-blue-100"
+                          : "border-zinc-200 hover:border-zinc-400 hover:bg-zinc-50"
+                      }`}
+                      onClick={() => setSelectedImage(foto)}
+                    >
+                      <div className="absolute left-2 top-2 z-10 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
+                        {index + 1}
+                      </div>
+                      <img
+                        src={foto}
+                        alt={`Foto ${index + 1} de ${perfil.nombre}`}
+                        className="h-24 w-24 object-contain p-1.5 md:h-28 md:w-28 lg:h-[96px] lg:w-full"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         <div className="rounded-3xl border border-zinc-200 bg-white p-7 shadow-sm">

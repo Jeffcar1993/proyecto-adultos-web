@@ -12,6 +12,12 @@ export const perfilSchema = z.object({
   barrio: z.string().optional(), // Barrio es opcional
   telefono: z.string().min(7, "Teléfono inválido"),
   whatsapp: z.string().min(7, "WhatsApp inválido"),
+  edad: z
+    .number({ invalid_type_error: "Ingresa una edad válida" })
+    .int()
+    .min(18, "Debes ser mayor de 18 años")
+    .max(99, "Edad inválida")
+    .optional(),
   fotos: z
     .any()
     .refine((files) => isFileList(files) && files.length > 0, "Debes subir al menos una foto.")

@@ -22,6 +22,14 @@ export const CreatePerfilSchema = z.object({
       .min(7)
       .max(20)
       .optional(),
+
+    edad: z
+      .coerce
+      .number()
+      .int()
+      .min(18, "Debes ser mayor de 18 años")
+      .max(99, "Edad inválida")
+      .optional(),
     
     // Validamos que el array de fotos tenga contenido y no se pase de 5
     fotos: z

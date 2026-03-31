@@ -72,7 +72,59 @@ export async function migratePerfil() {
 
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // 3. Crear índice departamento
+    // 3. Agregar columna edad
+    try {
+      const checkEdad = await queryWithRetry(
+        "SELECT column_name FROM information_schema.columns WHERE table_name='perfiles' AND column_name='edad';"
+      );
+
+      if (checkEdad.rows.length === 0) {
+        await queryWithRetry(
+          'ALTER TABLE perfiles ADD COLUMN edad INTEGER;'
+        );
+        changesApplied++;
+      }
+    } catch (error) {
+      console.log("⚠️ No se pudo agregar edad:", (error as Error).message);
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // 4. Agregar restricción de edad válida
+    try {
+      const checkEdadConstraint = await queryWithRetry(
+        "SELECT conname FROM pg_constraint WHERE conrelid = 'perfiles'::regclass AND conname = 'perfiles_edad_check';"
+      );
+
+      if (checkEdadConstraint.rows.length === 0) {
+        await queryWithRetry(
+          'ALTER TABLE perfiles ADD CONSTRAINT perfiles_edad_check CHECK (edad IS NULL OR (edad >= 18 AND edad <= 99));'
+        );
+        changesApplied++;
+      }
+    } catch (error) {
+      console.log("⚠️ No se pudo agregar restricción de edad:", (error as Error).message);
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // 5. Eliminar restricción que limita a un anuncio por usuario
+    try {
+      const checkUniqueUsuarioPerfil = await queryWithRetry(
+        "SELECT conname FROM pg_constraint WHERE conrelid = 'perfiles'::regclass AND conname = 'unique_usuario_perfil';"
+      );
+
+      if (checkUniqueUsuarioPerfil.rows.length > 0) {
+        await queryWithRetry('ALTER TABLE perfiles DROP CONSTRAINT unique_usuario_perfil;');
+        changesApplied++;
+      }
+    } catch (error) {
+      console.log("⚠️ No se pudo eliminar unique_usuario_perfil:", (error as Error).message);
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // 6. Crear índice departamento
     try {
       const checkIndexDep = await queryWithRetry(
         `SELECT indexname FROM pg_indexes WHERE tablename='perfiles' AND indexname='idx_perfiles_departamento';`
@@ -88,7 +140,7 @@ export async function migratePerfil() {
 
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // 4. Crear índice ciudad
+    // 7. Crear índice ciudad
     try {
       const checkIndexCity = await queryWithRetry(
         `SELECT indexname FROM pg_indexes WHERE tablename='perfiles' AND indexname='idx_perfiles_ciudad';`
@@ -104,7 +156,7 @@ export async function migratePerfil() {
 
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // 5. Crear índice barrio
+    // 8. Crear índice barrio
     try {
       const checkIndexBarrio = await queryWithRetry(
         `SELECT indexname FROM pg_indexes WHERE tablename='perfiles' AND indexname='idx_perfiles_barrio';`
