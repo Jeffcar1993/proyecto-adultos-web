@@ -52,11 +52,11 @@ export function SiteHeader() {
             </>
           ) : (
             <>
-              <Button asChild variant="outline" className="hidden h-12 rounded-full px-6 text-sm font-bold md:inline-flex">
+              <Button asChild className="hidden h-12 rounded-full bg-blue-600 px-6 text-sm font-bold text-white shadow-lg shadow-blue-200 hover:bg-blue-700 md:inline-flex">
                 <Link to="/mi-perfil">Mi Perfil</Link>
               </Button>
 
-              <Button onClick={handleLogout} className="h-12 rounded-full bg-zinc-900 px-6 text-sm font-bold text-white hover:bg-black">
+              <Button onClick={handleLogout} className="h-12 rounded-full bg-red-600 px-6 text-sm font-bold text-white hover:bg-red-700">
                 Cerrar Sesión
               </Button>
 
