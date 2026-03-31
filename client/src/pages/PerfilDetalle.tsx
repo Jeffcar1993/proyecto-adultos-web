@@ -99,7 +99,7 @@ export function PerfilDetalle() {
       </Helmet>
 
       <div className="mb-6">
-        <Button asChild variant="outline" className="rounded-full border-zinc-300">
+        <Button asChild className="rounded-full bg-blue-600 hover:bg-blue-700 text-white">
           <Link to="/perfiles">
             <ArrowLeft size={16} className="mr-2" />
             Volver a todos los perfiles
@@ -108,27 +108,27 @@ export function PerfilDetalle() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <div className="space-y-4">
-          <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-3">
+          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 shadow-sm">
             <img
               src={selectedImage ?? "/placeholder-user.png"}
               alt={perfil.nombre}
-              className="h-[420px] w-full object-cover md:h-[460px]"
+              className="h-[320px] w-full object-cover object-top md:h-[380px]"
             />
           </div>
 
           {fotos.length > 1 && (
-            <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
+            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(fotos.length, 5)}, 1fr)` }}>
               {fotos.map((foto) => (
                 <button
                   key={foto}
                   type="button"
                   className={`overflow-hidden rounded-xl border transition ${
-                    selectedImage === foto ? "border-blue-600" : "border-zinc-200 hover:border-zinc-300"
+                    selectedImage === foto ? "border-blue-600 ring-2 ring-blue-400" : "border-zinc-200 hover:border-zinc-400"
                   }`}
                   onClick={() => setSelectedImage(foto)}
                 >
-                  <img src={foto} alt={`Foto de ${perfil.nombre}`} className="h-20 w-full object-cover" />
+                  <img src={foto} alt={`Foto de ${perfil.nombre}`} className="h-16 w-full object-cover object-top" />
                 </button>
               ))}
             </div>
