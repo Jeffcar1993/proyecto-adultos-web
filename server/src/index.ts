@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import pool from './config/db.ts';
-import { migratePerfil } from './config/migrations.ts';
+import { migratePerfil, migrateUsuarios } from './config/migrations.ts';
 import perfilRoutes from './routes/perfil.routes.ts';
 import authRoutes from './routes/auth.routes.ts';
 
@@ -30,7 +30,8 @@ app.listen(PORT, () => {
 });
 
 // Intentar migración con manejo de errores
-migratePerfil()
+migrateUsuarios()
+  .then(() => migratePerfil())
   .then(() => undefined)
   .catch((error) => {
     console.error('⚠️ Error en migración (continuando):', error.message);

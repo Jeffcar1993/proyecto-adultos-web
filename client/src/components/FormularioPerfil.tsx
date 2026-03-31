@@ -101,8 +101,7 @@ export function FormularioPerfil() {
       
       setPreviews([]);
       form.reset();
-      // Redirigir al inicio con un estado de éxito
-      navigate("/", { state: { anuncioPublicado: true } });
+      navigate("/mi-perfil");
     } catch (error) {
       console.error("Error al publicar:", error);
       if (axios.isAxiosError(error)) {

@@ -12,6 +12,7 @@ export function CrearCuenta() {
   const { login } = useAuth(); // Obtener función de login del contexto de autenticación
 
   // Estados para el formulario
+  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,6 +25,7 @@ export function CrearCuenta() {
     
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/register`, {
+        nombre,
         email,
         password
       });
@@ -31,7 +33,7 @@ export function CrearCuenta() {
       // Si el registro te loguea automáticamente (recomendado)
       if (response.data.token) {
         login(response.data.token, response.data.user);
-        navigate("/nuevo"); // Ir al formulario de perfil
+        navigate("/mi-perfil");
       } else {
         navigate("/iniciar-sesion"); // O ir al login si prefieres
       }
@@ -84,7 +86,13 @@ export function CrearCuenta() {
 
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Nombre Completo</label>
-                <Input placeholder="Tu nombre" className="h-12 rounded-xl border-zinc-200 bg-zinc-50 focus:ring-blue-600/10" />
+                <Input
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  required
+                  placeholder="Tu nombre"
+                  className="h-12 rounded-xl border-zinc-200 bg-zinc-50 focus:ring-blue-600/10"
+                />
               </div>
 
               <div className="space-y-2 text-left">

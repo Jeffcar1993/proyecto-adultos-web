@@ -125,3 +125,35 @@ export async function migratePerfil() {
     console.error("❌ Error crítico en migración:", error);
   }
 }
+
+export async function migrateUsuarios() {
+  try {
+    let changesApplied = 0;
+
+    await queryWithRetry(`
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    const checkNombre = await queryWithRetry(
+      "SELECT column_name FROM information_schema.columns WHERE table_name='usuarios' AND column_name='nombre';"
+    );
+
+    if (checkNombre.rows.length === 0) {
+      await queryWithRetry("ALTER TABLE usuarios ADD COLUMN nombre VARCHAR(120);");
+      changesApplied++;
+    }
+
+    await queryWithRetry("UPDATE usuarios SET nombre = split_part(email, '@', 1) WHERE nombre IS NULL OR TRIM(nombre) = '';");
+
+    if (changesApplied > 0) {
+      console.log(`✅ Migración usuarios aplicada: ${changesApplied}`);
+    }
+  } catch (error) {
+    console.error('❌ Error en migración de usuarios:', error);
+  }
+}

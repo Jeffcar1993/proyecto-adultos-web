@@ -114,3 +114,64 @@ export const getPerfilById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error al obtener el perfil" });
   }
 };
+
+export const getMisPerfiles = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'No autenticado' });
+    }
+
+    const result = await pool.query(
+      `SELECT id, nombre, descripcion, foto_principal, ciudad, departamento, barrio, telefono, whatsapp, created_at
+       FROM perfiles
+       WHERE usuario_id = $1
+       ORDER BY created_at DESC`,
+      [req.userId]
+    );
+
+    return res.json(result.rows);
+  } catch (error) {
+    console.error('Error en getMisPerfiles:', error);
+    return res.status(500).json({ error: 'Error al obtener tus anuncios' });
+  }
+};
+
+export const actualizarPerfil = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.userId) {
+      return res.status(401).json({ error: 'No autenticado' });
+    }
+
+    const current = await pool.query(
+      'SELECT id FROM perfiles WHERE id = $1 AND usuario_id = $2',
+      [id, req.userId]
+    );
+
+    if (!current.rows.length) {
+      return res.status(404).json({ error: 'Anuncio no encontrado o no autorizado' });
+    }
+
+    const { nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp } = req.body;
+
+    const result = await pool.query(
+      `UPDATE perfiles
+       SET nombre = $1,
+           descripcion = $2,
+           departamento = $3,
+           ciudad = $4,
+           barrio = $5,
+           telefono = $6,
+           whatsapp = $7
+       WHERE id = $8 AND usuario_id = $9
+       RETURNING *`,
+      [nombre, descripcion, departamento, ciudad, barrio ?? null, telefono, whatsapp, id, req.userId]
+    );
+
+    return res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error en actualizarPerfil:', error);
+    return res.status(500).json({ error: 'Error al actualizar anuncio' });
+  }
+};

@@ -27,7 +27,7 @@ export function Login() {
 
       login(response.data.token, response.data.user);
       
-      navigate("/nuevo");
+      navigate("/mi-perfil");
     } catch {
       setSubmitError("Credenciales incorrectas. Verifica tu correo y contraseña.");
     } finally {

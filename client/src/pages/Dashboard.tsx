@@ -112,7 +112,7 @@ export function Dashboard() {
                 {/* BOTONES DE ACCIÓN */}
                 <div className="grid grid-cols-2 gap-4 mt-10">
                   <Button 
-                    onClick={() => navigate(`/editar/${perfil.id}`)}
+                    onClick={() => navigate(`/editar-perfil/${perfil.id}`)}
                     className="h-14 rounded-2xl bg-zinc-900 hover:bg-black text-white font-bold uppercase tracking-widest text-xs"
                   >
                     <Edit3 size={16} className="mr-2" /> Editar Información

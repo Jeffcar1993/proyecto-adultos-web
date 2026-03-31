@@ -2,6 +2,7 @@ import { createContext } from "react";
 
 export interface AuthUser {
   id: number;
+  nombre: string | null;
   email: string;
 }
 
