@@ -21,8 +21,23 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
+function normalizeDatabaseUrl(databaseUrl: string) {
+  try {
+    const parsedUrl = new URL(databaseUrl);
+
+    // Neon ya usa TLS y el cliente recibe la configuración SSL explícitamente abajo.
+    // Quitamos sslmode para evitar el warning emitido por pg-connection-string.
+    parsedUrl.searchParams.delete('sslmode');
+    parsedUrl.searchParams.delete('uselibpqcompat');
+
+    return parsedUrl.toString();
+  } catch {
+    return databaseUrl;
+  }
+}
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: normalizeDatabaseUrl(process.env.DATABASE_URL),
   ssl: {
     rejectUnauthorized: false, // Necesario para Neon Tech
   },

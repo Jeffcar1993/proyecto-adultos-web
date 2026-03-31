@@ -21,7 +21,7 @@ async function queryWithRetry(queryStr: string, params: unknown[] = [], retries 
 
 export async function migratePerfil() {
   try {
-    console.log('🔄 Iniciando migraciones...');
+    let changesApplied = 0;
     
     // Verificar que la tabla existe
     try {
@@ -43,13 +43,10 @@ export async function migratePerfil() {
       );
 
       if (checkDepartamento.rows.length === 0) {
-        console.log("Agregando columna 'departamento'...");
         await queryWithRetry(
           "ALTER TABLE perfiles ADD COLUMN departamento VARCHAR(100);"
         );
-        console.log("✅ Columna 'departamento' agregada");
-      } else {
-        console.log("✅ Columna 'departamento' ya existe");
+        changesApplied++;
       }
     } catch (error) {
       console.log("⚠️ No se pudo agregar departamento:", (error as Error).message);
@@ -64,13 +61,10 @@ export async function migratePerfil() {
       );
 
       if (checkBarrio.rows.length === 0) {
-        console.log("Agregando columna 'barrio'...");
         await queryWithRetry(
           "ALTER TABLE perfiles ADD COLUMN barrio VARCHAR(100);"
         );
-        console.log("✅ Columna 'barrio' agregada");
-      } else {
-        console.log("✅ Columna 'barrio' ya existe");
+        changesApplied++;
       }
     } catch (error) {
       console.log("⚠️ No se pudo agregar barrio:", (error as Error).message);
@@ -85,11 +79,8 @@ export async function migratePerfil() {
       );
 
       if (checkIndexDep.rows.length === 0) {
-        console.log("Creando índice en departamento...");
         await queryWithRetry("CREATE INDEX idx_perfiles_departamento ON perfiles(departamento);");
-        console.log("✅ Índice en departamento creado");
-      } else {
-        console.log("✅ Índice departamento ya existe");
+        changesApplied++;
       }
     } catch (error) {
       console.log("⚠️ No se pudo crear índice departamento:", (error as Error).message);
@@ -104,11 +95,8 @@ export async function migratePerfil() {
       );
 
       if (checkIndexCity.rows.length === 0) {
-        console.log("Creando índice en ciudad...");
         await queryWithRetry("CREATE INDEX idx_perfiles_ciudad ON perfiles(ciudad);");
-        console.log("✅ Índice en ciudad creado");
-      } else {
-        console.log("✅ Índice ciudad ya existe");
+        changesApplied++;
       }
     } catch (error) {
       console.log("⚠️ No se pudo crear índice ciudad:", (error as Error).message);
@@ -123,17 +111,16 @@ export async function migratePerfil() {
       );
 
       if (checkIndexBarrio.rows.length === 0) {
-        console.log("Creando índice en barrio...");
         await queryWithRetry("CREATE INDEX idx_perfiles_barrio ON perfiles(barrio);");
-        console.log("✅ Índice en barrio creado");
-      } else {
-        console.log("✅ Índice barrio ya existe");
+        changesApplied++;
       }
     } catch (error) {
       console.log("⚠️ No se pudo crear índice barrio:", (error as Error).message);
     }
 
-    console.log("✅ Migraciones completadas");
+    if (changesApplied > 0) {
+      console.log(`✅ Migraciones aplicadas: ${changesApplied}`);
+    }
   } catch (error) {
     console.error("❌ Error crítico en migración:", error);
   }

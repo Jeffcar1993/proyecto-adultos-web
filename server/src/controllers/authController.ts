@@ -15,7 +15,18 @@ export const register = async (req: Request, res: Response) => {
       [email, hashedPassword]
     );
 
-    res.status(201).json({ message: "Usuario creado", user: result.rows[0] });
+    const newUser = result.rows[0];
+    const token = jwt.sign(
+      { userId: newUser.id, email: newUser.email },
+      process.env.JWT_SECRET || 'secret_key_provisoria',
+      { expiresIn: '24h' }
+    );
+
+    res.status(201).json({
+      message: 'Usuario creado',
+      token,
+      user: newUser,
+    });
   } catch (error) {
     res.status(500).json({ error: "El email ya existe o error de servidor" });
   }

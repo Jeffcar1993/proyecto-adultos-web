@@ -8,19 +8,27 @@ export const crearPerfil = async (req: AuthRequest, res: Response) => {
   const usuario_id = req.userId; // Obtenido del Token
 
   try {
+    const files = (req.files as Express.Multer.File[] | undefined) ?? [];
+
+    if (!files.length) {
+      return res.status(400).json({ error: 'Debes subir al menos una foto.' });
+    }
+
+    const fotosUrls = await Promise.all(
+      files.map((file) => uploadToCloudinary(file.buffer, 'perfiles_adultos'))
+    );
+    const fotoPrincipal = fotosUrls[0];
+
     const query = `
       INSERT INTO perfiles 
       (nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp, usuario_id, fotos, foto_principal)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *;
     `;
-    
-    // Aquí iría tu lógica de Cloudinary para las fotos...
-    const fotosUrls = req.files ? (req.files as any[]).map(f => f.path) : [];
 
     const result = await pool.query(query, [
       nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp, 
-      usuario_id, fotosUrls, fotosUrls[0]
+      usuario_id, fotosUrls, fotoPrincipal
     ]);
 
     res.status(201).json(result.rows[0]);

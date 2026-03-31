@@ -15,10 +15,12 @@ export function CrearCuenta() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleRegistro = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSubmitError(null);
     
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/register`, {
@@ -34,7 +36,7 @@ export function CrearCuenta() {
         navigate("/iniciar-sesion"); // O ir al login si prefieres
       }
     } catch {
-      alert("Error al crear cuenta. El correo podría estar en uso.");
+      setSubmitError("Error al crear cuenta. El correo podría estar en uso.");
     } finally {
       setLoading(false);
     }
@@ -98,6 +100,12 @@ export function CrearCuenta() {
               <Button type="submit" disabled={loading} className="text-white w-full h-14 rounded-xl bg-blue-600 text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
                 {loading ? "Creando cuenta..." : "Crear Mi Cuenta"}
               </Button>
+
+              {submitError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                  {submitError}
+                </div>
+              )}
             </form>
 
             <Button

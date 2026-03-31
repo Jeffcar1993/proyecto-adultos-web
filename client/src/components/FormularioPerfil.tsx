@@ -3,25 +3,38 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { perfilSchema } from "@/schema/perfilSchema";
+import { perfilSchema, type PerfilFormValues } from "@/schema/perfilSchema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Loader2, Camera, MapPin, Smartphone, User, X } from "lucide-react";
+import { useAuth } from "@/context/useAuth";
 
 // Importación de datos geográficos
 import colombiaData from "@/data/colombia.json";
 
 export function FormularioPerfil() {
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [previews, setPreviews] = useState<string[]>([]);
   const [ciudadesDisponibles, setCiudadesDisponibles] = useState<string[]>([]);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const form = useForm({
+  const form = useForm<PerfilFormValues>({
     resolver: zodResolver(perfilSchema),
     mode: "onChange",
+    defaultValues: {
+      nombre: "",
+      descripcion: "",
+      departamento: "",
+      ciudad: "",
+      barrio: "",
+      telefono: "",
+      whatsapp: "",
+      fotos: undefined,
+    },
   });
 
   // Observar el cambio de departamento para filtrar ciudades
@@ -53,6 +66,15 @@ export function FormularioPerfil() {
 
   async function onSubmit(values: Record<string, unknown>) {
     setLoading(true);
+    setSubmitError(null);
+
+    if (!token) {
+      setSubmitError("Debes iniciar sesión para publicar tu anuncio.");
+      setLoading(false);
+      navigate("/iniciar-sesion");
+      return;
+    }
+
     const formData = new FormData();
 
     // Append de campos de texto
@@ -71,7 +93,10 @@ export function FormularioPerfil() {
 
     try {
       await axios.post(`${import.meta.env.VITE_API_URL}/perfiles`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
       
       setPreviews([]);
@@ -80,7 +105,17 @@ export function FormularioPerfil() {
       navigate("/", { state: { anuncioPublicado: true } });
     } catch (error) {
       console.error("Error al publicar:", error);
-      alert("Error al procesar el anuncio. Revisa la consola.");
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          setSubmitError("Tu sesión expiró o no es válida. Inicia sesión nuevamente.");
+        } else if (error.response?.status === 400) {
+          setSubmitError((error.response.data as { error?: string })?.error ?? "Datos incompletos para publicar el anuncio.");
+        } else {
+          setSubmitError("No se pudo publicar el anuncio. Revisa los datos e inténtalo de nuevo.");
+        }
+      } else {
+        setSubmitError("No se pudo publicar el anuncio. Revisa los datos e inténtalo de nuevo.");
+      }
     } finally {
       setLoading(false);
     }
@@ -347,6 +382,13 @@ export function FormularioPerfil() {
               {Object.entries(form.formState.errors).map(([field, error]) => (
                 <p key={field}>• {error?.message as string}</p>
               ))}
+            </div>
+          )}
+
+          {submitError && (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 animate-in fade-in slide-in-from-top-2">
+              <p className="font-bold uppercase tracking-wide text-xs mb-1">No se pudo publicar</p>
+              <p>{submitError}</p>
             </div>
           )}
         </form>

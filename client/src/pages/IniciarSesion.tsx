@@ -12,11 +12,13 @@ export function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSubmitError(null);
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
         email,
@@ -27,7 +29,7 @@ export function Login() {
       
       navigate("/nuevo");
     } catch {
-      alert("Credenciales incorrectas");
+      setSubmitError("Credenciales incorrectas. Verifica tu correo y contraseña.");
     } finally {
       setLoading(false);
     }
@@ -114,6 +116,12 @@ export function Login() {
             <Button type="submit" disabled={loading} className="text-white w-full h-12 rounded-xl bg-blue-600 text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
               {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </Button>
+
+            {submitError && (
+              <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                {submitError}
+              </div>
+            )}
           </form>
 
           <p className="text-center text-sm text-zinc-500">
