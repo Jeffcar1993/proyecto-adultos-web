@@ -47,7 +47,7 @@ export function Home() {
       "La plataforma más discreta y segura de anuncios para adultos en Colombia. Perfiles 100% verificados.",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://erotikcolombia.com/explorar?q={search_term_string}",
+      target: "https://erotikcolombia.com/perfiles?q={search_term_string}",
       "query-input": "required name=search_term_string",
     },
   };
@@ -102,7 +102,7 @@ export function Home() {
             <div className="flex flex-col sm:flex-row gap-4">
               {/* IMPORTANTE: Usa asChild para que el cursor funcione correctamente con el Link */}
               <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 h-14 text-lg font-bold shadow-lg shadow-blue-200 cursor-pointer">
-                <Link to="/explorar">Explorar Ahora</Link>
+                <Link to="/perfiles">Explorar Ahora</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="rounded-full px-8 h-14 text-lg border-zinc-300 bg-white hover:bg-zinc-50 cursor-pointer">
                 <Link to="/crear-cuenta">Publicar Anuncio</Link>
@@ -132,13 +132,15 @@ export function Home() {
             <h2 className="text-3xl font-black uppercase tracking-tight">Ciudades Top</h2>
             <p className="text-zinc-500">Selecciona tu ubicación actual</p>
           </div>
-          <Button variant="link" className="text-blue-600 font-bold">Ver todas <ArrowRight size={16} className="ml-2" /></Button>
+          <Button asChild variant="link" className="text-blue-600 font-bold">
+            <Link to="/perfiles">Ver todas <ArrowRight size={16} className="ml-2" /></Link>
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {cities.map((city) => (
             <Link
-              to={`/explorar?ciudad=${encodeURIComponent(city.name)}`}
+              to={`/perfiles?ciudad=${encodeURIComponent(city.name)}`}
               key={city.name}
               className="group relative h-[400px] overflow-hidden rounded-3xl bg-zinc-200"
             >

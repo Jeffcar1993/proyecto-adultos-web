@@ -113,10 +113,10 @@ export function SearchHeader() {
 
   const handleSelect = (item: SugerenciaItem) => {
     if (item.tipo === "departamento") {
-      navigate(`/explorar?departamento=${encodeURIComponent(item.nombre)}`);
+      navigate(`/perfiles?departamento=${encodeURIComponent(item.nombre)}`);
     } else if (item.tipo === "ciudad") {
       navigate(
-        `/explorar?departamento=${encodeURIComponent(item.departamento || "")}&ciudad=${encodeURIComponent(item.nombre)}`
+        `/perfiles?departamento=${encodeURIComponent(item.departamento || "")}&ciudad=${encodeURIComponent(item.nombre)}`
       );
     }
     // Limpiar input después de navegar
@@ -146,7 +146,7 @@ export function SearchHeader() {
           handleSelect(sugerencias[selectedIndex]);
         } else if (input.trim()) {
           // Búsqueda libre por nombre
-          navigate(`/explorar?q=${encodeURIComponent(input)}`);
+          navigate(`/perfiles?q=${encodeURIComponent(input)}`);
           setInput("");
         }
         break;
@@ -178,7 +178,7 @@ export function SearchHeader() {
       onSubmit={(e) => {
         e.preventDefault();
         if (input.trim()) {
-          navigate(`/explorar?q=${encodeURIComponent(input)}`);
+          navigate(`/perfiles?q=${encodeURIComponent(input)}`);
           setInput("");
         }
       }}

@@ -8,9 +8,10 @@ import { SiteFooter } from "@/components/layout/SiteFooter"
 import { SiteHeader } from "@/components/layout/SiteHeader"
 import { CrearCuenta } from "@/pages/CrearCuenta"
 import { Home } from "@/pages/Home"
-import { Explorar } from "@/pages/Explorar"
+import { TodosPerfiles } from "@/pages/TodosPerfiles"
 import { Login } from "@/pages/IniciarSesion"
 import { MiPerfil } from "@/pages/MiPerfil"
+import { PerfilDetalle } from "@/pages/PerfilDetalle"
 import { CondicionesUso } from "@/pages/CondicionesUso"
 import { ContactoPage } from "@/pages/ContactoPage"
 import { ControlParental } from "@/pages/ControlParental"
@@ -38,7 +39,8 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/explorar" element={<Explorar />} />
+            <Route path="/perfiles" element={<TodosPerfiles />} />
+            <Route path="/perfil/:id" element={<PerfilDetalle />} />
             <Route path="/mi-perfil" element={<ProtectedRoute><MiPerfil /></ProtectedRoute>} />
             <Route path="/nuevo" element={<ProtectedRoute><FormularioPerfil /></ProtectedRoute>} />
             <Route path="/iniciar-sesion" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
