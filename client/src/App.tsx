@@ -10,6 +10,7 @@ import { CrearCuenta } from "@/pages/CrearCuenta"
 import { Home } from "@/pages/Home"
 import { TodosPerfiles } from "@/pages/TodosPerfiles"
 import { Login } from "@/pages/IniciarSesion"
+import { RecuperarContraseña } from "@/pages/RecuperarContraseña"
 import { MiPerfil } from "@/pages/MiPerfil"
 import { PerfilDetalle } from "@/pages/PerfilDetalle"
 import { CondicionesUso } from "@/pages/CondicionesUso"
@@ -45,6 +46,7 @@ function App() {
             <Route path="/nuevo" element={<ProtectedRoute><FormularioPerfil /></ProtectedRoute>} />
             <Route path="/iniciar-sesion" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
             <Route path="/crear-cuenta" element={<PublicOnlyRoute><CrearCuenta /></PublicOnlyRoute>} />
+            <Route path="/recuperar-contraseña" element={<RecuperarContraseña />} />
             <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
             <Route path="/condiciones-uso" element={<CondicionesUso />} />
             <Route path="/cookies" element={<CookiesPage />} />

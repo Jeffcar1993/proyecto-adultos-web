@@ -81,3 +81,92 @@ export const getMe = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ error: 'Error al obtener usuario' });
   }
 };
+export const requestPasswordReset = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'El correo es obligatorio.' });
+  }
+
+  try {
+    const userResult = await pool.query(
+      'SELECT id FROM usuarios WHERE email = $1',
+      [email]
+    );
+
+    if (!userResult.rows.length) {
+      return res.status(404).json({ error: 'No existe usuario con ese correo.' });
+    }
+
+    const resetToken = jwt.sign(
+      { userId: userResult.rows[0].id, email, type: 'password-reset' },
+      process.env.JWT_SECRET || 'secret_key_provisoria',
+      { expiresIn: '1h' }
+    );
+
+    const resetTokenHash = await bcrypt.hash(resetToken, 10);
+    const expiresAt = new Date(Date.now() + 3600000);
+
+    await pool.query(
+      'UPDATE usuarios SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
+      [resetTokenHash, expiresAt, userResult.rows[0].id]
+    );
+
+    return res.json({
+      message: 'Se ha enviado un correo con las instrucciones para recuperar tu contraseña.',
+      resetToken
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al procesar la solicitud.' });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ error: 'Token y nueva contraseña son obligatorios.' });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'secret_key_provisoria'
+    ) as { userId: number; type: string };
+
+    if (decoded.type !== 'password-reset') {
+      return res.status(400).json({ error: 'Token inválido.' });
+    }
+
+    const userResult = await pool.query(
+      'SELECT reset_token, reset_token_expires FROM usuarios WHERE id = $1',
+      [decoded.userId]
+    );
+
+    if (!userResult.rows.length) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    const user = userResult.rows[0];
+    if (!user.reset_token || new Date() > new Date(user.reset_token_expires)) {
+      return res.status(400).json({ error: 'El token ha expirado. Solicita uno nuevo.' });
+    }
+
+    if (!(await bcrypt.compare(token, user.reset_token))) {
+      return res.status(400).json({ error: 'Token inválido.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query(
+      'UPDATE usuarios SET password = $1, reset_token = NULL, reset_token_expires = NULL WHERE id = $2',
+      [hashedPassword, decoded.userId]
+    );
+
+    return res.json({ message: 'Contraseña actualizada exitosamente.' });
+  } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({ error: 'Token inválido o expirado.' });
+    }
+    res.status(500).json({ error: 'Error al resetear la contraseña.' });
+  }
+};

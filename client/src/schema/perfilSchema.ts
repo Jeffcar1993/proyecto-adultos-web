@@ -6,7 +6,7 @@ const isFileList = (value: unknown): value is FileList => value instanceof FileL
 
 export const perfilSchema = z.object({
   nombre: z.string().min(3, "Mínimo 3 caracteres"),
-  descripcion: z.string().max(500, "Máximo 500 caracteres"),
+  descripcion: z.string().min(1, "La descripción es obligatoria").max(800, "Máximo 800 caracteres"),
   departamento: z.string().min(1, "El departamento es obligatorio"),
   ciudad: z.string().min(1, "La ciudad es obligatoria"),
   barrio: z.string().optional(), // Barrio es opcional

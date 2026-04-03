@@ -202,19 +202,45 @@ export function FormularioPerfil() {
             <FormField
               control={form.control}
               name="descripcion"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-bold">Descripción</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="rounded-xl bg-zinc-50 border-none min-h-[120px] focus:ring-2 focus:ring-blue-600/10"
-                      placeholder="Cuéntanos sobre tus servicios, disponibilidad y lo que te hace única..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const count = field.value?.length ?? 0;
+                const isOver = count > 800;
+                return (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="font-bold">Descripción</FormLabel>
+                      <span
+                        className={`text-xs font-bold tabular-nums transition-colors ${
+                          isOver
+                            ? "text-red-600"
+                            : count >= 700
+                            ? "text-amber-500"
+                            : "text-zinc-400"
+                        }`}
+                      >
+                        {count}/800
+                      </span>
+                    </div>
+                    <FormControl>
+                      <Textarea
+                        className={`rounded-xl bg-zinc-50 border-none min-h-[120px] focus:ring-2 transition-colors ${
+                          isOver
+                            ? "ring-2 ring-red-400 focus:ring-red-400 bg-red-50"
+                            : "focus:ring-blue-600/10"
+                        }`}
+                        placeholder="Cuéntanos sobre tus servicios, disponibilidad y lo que te hace única..."
+                        {...field}
+                      />
+                    </FormControl>
+                    {isOver && (
+                      <p className="text-xs text-red-600 font-semibold">
+                        Máximo 800 caracteres — por favor acorta tu descripción.
+                      </p>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
           </div>
 

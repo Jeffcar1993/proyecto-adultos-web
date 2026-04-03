@@ -202,6 +202,24 @@ export async function migrateUsuarios() {
 
     await queryWithRetry("UPDATE usuarios SET nombre = split_part(email, '@', 1) WHERE nombre IS NULL OR TRIM(nombre) = '';");
 
+    const checkResetToken = await queryWithRetry(
+      "SELECT column_name FROM information_schema.columns WHERE table_name='usuarios' AND column_name='reset_token';"
+    );
+
+    if (checkResetToken.rows.length === 0) {
+      await queryWithRetry("ALTER TABLE usuarios ADD COLUMN reset_token TEXT;");
+      changesApplied++;
+    }
+
+    const checkResetTokenExpires = await queryWithRetry(
+      "SELECT column_name FROM information_schema.columns WHERE table_name='usuarios' AND column_name='reset_token_expires';"
+    );
+
+    if (checkResetTokenExpires.rows.length === 0) {
+      await queryWithRetry("ALTER TABLE usuarios ADD COLUMN reset_token_expires TIMESTAMPTZ;");
+      changesApplied++;
+    }
+
     if (changesApplied > 0) {
       console.log(`✅ Migración usuarios aplicada: ${changesApplied}`);
     }

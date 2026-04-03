@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeft, ImageIcon, Loader2, MapPin, MessageCircle, Phone } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, ImageIcon, Loader2, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PerfilDetalleData {
@@ -12,6 +12,7 @@ interface PerfilDetalleData {
   departamento: string;
   ciudad: string;
   barrio: string | null;
+  edad: number | null;
   telefono: string;
   whatsapp: string;
   foto_principal: string | null;
@@ -30,6 +31,9 @@ export function PerfilDetalle() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [expandedDesc, setExpandedDesc] = useState(false);
+
+  const MAX_DESC = 800;
 
   useEffect(() => {
     const fetchPerfil = async () => {
@@ -155,16 +159,40 @@ export function PerfilDetalle() {
         <div className="rounded-3xl border border-zinc-200 bg-white p-7 shadow-sm">
           <h1 className="text-3xl font-black uppercase tracking-tight text-zinc-900">{perfil.nombre}</h1>
 
-          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">
-            <MapPin size={14} />
-            {perfil.ciudad}
-            {perfil.barrio ? `, ${perfil.barrio}` : ""}
-            {perfil.departamento ? ` - ${perfil.departamento}` : ""}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <div className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">
+              <MapPin size={14} />
+              {perfil.ciudad}
+              {perfil.barrio ? `, ${perfil.barrio}` : ""}
+              {perfil.departamento ? ` - ${perfil.departamento}` : ""}
+            </div>
+            {perfil.edad && (
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
+                {perfil.edad} años
+              </div>
+            )}
           </div>
 
           <div className="mt-6">
             <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">Descripción</h2>
-            <p className="mt-2 whitespace-pre-line leading-relaxed text-zinc-700">{perfil.descripcion}</p>
+            <p className="mt-2 whitespace-pre-line leading-relaxed text-zinc-700">
+              {expandedDesc || perfil.descripcion.length <= MAX_DESC
+                ? perfil.descripcion
+                : perfil.descripcion.slice(0, MAX_DESC) + "…"}
+            </p>
+            {perfil.descripcion.length > MAX_DESC && (
+              <button
+                type="button"
+                onClick={() => setExpandedDesc((v) => !v)}
+                className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                {expandedDesc ? (
+                  <><ChevronUp size={14} /> Ver menos</>
+                ) : (
+                  <><ChevronDown size={14} /> Ver más</>
+                )}
+              </button>
+            )}
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">

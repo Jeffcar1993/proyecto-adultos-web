@@ -41,9 +41,9 @@ const pool = new Pool({
   ssl: {
     rejectUnauthorized: false, // Necesario para Neon Tech
   },
-  min: 2,
+  min: 0,
   max: 10,
-  idleTimeoutMillis: 30000,
+  idleTimeoutMillis: 10000,
   connectionTimeoutMillis: 10000, // 10 segundos de timeout
 });
 

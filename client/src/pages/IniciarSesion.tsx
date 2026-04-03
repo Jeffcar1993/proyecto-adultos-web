@@ -98,7 +98,7 @@ export function Login() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <label className="text-xs font-black uppercase tracking-widest text-zinc-400">Contraseña</label>
-                <Link to="/recuperar" className="text-xs font-bold text-blue-600 hover:underline">¿Olvidaste tu contraseña?</Link>
+                <Link to="/recuperar-contraseña" className="text-xs font-bold text-blue-600 hover:underline">¿Olvidaste tu contraseña?</Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
