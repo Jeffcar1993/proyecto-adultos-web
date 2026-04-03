@@ -244,3 +244,24 @@ export const googleAuth = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Error al autenticar con Google.' });
   }
 };
+
+export const deleteAccount = async (req: AuthRequest, res: Response) => {
+  const userId = req.userId;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'No autenticado.' });
+  }
+
+  try {
+    // Eliminar perfiles (anuncios) del usuario primero por FK
+    await pool.query('DELETE FROM perfiles WHERE usuario_id = $1', [userId]);
+
+    // Eliminar el usuario
+    await pool.query('DELETE FROM usuarios WHERE id = $1', [userId]);
+
+    return res.status(200).json({ message: 'Cuenta eliminada correctamente.' });
+  } catch (error) {
+    console.error('Error en deleteAccount:', error);
+    return res.status(500).json({ error: 'No se pudo eliminar la cuenta. Intenta de nuevo.' });
+  }
+};

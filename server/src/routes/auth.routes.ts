@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMe, login, register, requestPasswordReset, resetPassword, googleAuth } from '../controllers/authController.ts';
+import { getMe, login, register, requestPasswordReset, resetPassword, googleAuth, deleteAccount } from '../controllers/authController.ts';
 import { authenticateToken } from '../middlewares/authMiddleware.ts';
 
 const router = Router();
@@ -10,5 +10,6 @@ router.post('/forgot-password', requestPasswordReset);
 router.post('/reset-password', resetPassword);
 router.post('/auth/google', googleAuth);
 router.get('/me', authenticateToken, getMe);
+router.delete('/me', authenticateToken, deleteAccount);
 
 export default router;
