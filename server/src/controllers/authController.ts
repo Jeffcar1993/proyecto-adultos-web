@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import https from 'https';
 import pool from '../config/db.ts';
 import type { AuthRequest } from '../middlewares/authMiddleware.ts';
 import { sendResetPasswordEmail } from '../services/emailService.ts';
@@ -168,5 +169,78 @@ export const resetPassword = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error en resetPassword:', error);
     return res.status(500).json({ error: 'Error al restablecer la contraseña.' });
+  }
+};
+
+export const googleAuth = async (req: Request, res: Response) => {
+  const { credential } = req.body;
+
+  if (!credential) {
+    return res.status(400).json({ error: 'Token de Google no proporcionado.' });
+  }
+
+  try {
+    // Verificar el access_token llamando a la API de Google desde el servidor
+    const googleUser = await new Promise<{
+      sub: string; email: string; name: string; email_verified: boolean;
+    }>((resolve, reject) => {
+      https.get(
+        `https://www.googleapis.com/oauth2/v3/userinfo`,
+        { headers: { Authorization: `Bearer ${credential}` } },
+        (googleRes) => {
+          let data = '';
+          googleRes.on('data', (chunk) => (data += chunk));
+          googleRes.on('end', () => {
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.error) return reject(new Error(parsed.error.message ?? 'Token inválido'));
+              resolve(parsed);
+            } catch {
+              reject(new Error('Respuesta inválida de Google'));
+            }
+          });
+        }
+      ).on('error', reject);
+    });
+
+    if (!googleUser.email_verified) {
+      return res.status(400).json({ error: 'El correo de Google no está verificado.' });
+    }
+
+    const { sub: googleId, email, name } = googleUser;
+
+    // Buscar usuario existente por google_id o email
+    let userResult = await pool.query(
+      'SELECT id, nombre, email, google_id FROM usuarios WHERE google_id = $1 OR email = $2',
+      [googleId, email]
+    );
+
+    let user = userResult.rows[0];
+
+    if (!user) {
+      // Crear nuevo usuario sin contraseña (solo Google)
+      const insertResult = await pool.query(
+        'INSERT INTO usuarios (nombre, email, google_id) VALUES ($1, $2, $3) RETURNING id, nombre, email',
+        [name ?? email.split('@')[0], email, googleId]
+      );
+      user = insertResult.rows[0];
+    } else if (!user.google_id) {
+      // Cuenta existente por email — vincular google_id
+      await pool.query('UPDATE usuarios SET google_id = $1 WHERE id = $2', [googleId, user.id]);
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET || 'secret_key_provisoria',
+      { expiresIn: '24h' }
+    );
+
+    return res.status(200).json({
+      token,
+      user: { id: user.id, nombre: user.nombre, email: user.email },
+    });
+  } catch (error) {
+    console.error('Error en googleAuth:', error);
+    return res.status(500).json({ error: 'Error al autenticar con Google.' });
   }
 };

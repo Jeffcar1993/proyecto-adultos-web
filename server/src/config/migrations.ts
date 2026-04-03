@@ -220,6 +220,17 @@ export async function migrateUsuarios() {
       changesApplied++;
     }
 
+    const checkGoogleId = await queryWithRetry(
+      "SELECT column_name FROM information_schema.columns WHERE table_name='usuarios' AND column_name='google_id';"
+    );
+
+    if (checkGoogleId.rows.length === 0) {
+      await queryWithRetry("ALTER TABLE usuarios ADD COLUMN google_id VARCHAR(255) UNIQUE;");
+      // password puede ser NULL para usuarios que solo usan Google
+      await queryWithRetry("ALTER TABLE usuarios ALTER COLUMN password DROP NOT NULL;");
+      changesApplied++;
+    }
+
     if (changesApplied > 0) {
       console.log(`✅ Migración usuarios aplicada: ${changesApplied}`);
     }
