@@ -65,21 +65,23 @@ export function PerfilCard({
       </Link>
       
       <CardFooter className="grid grid-cols-2 gap-2 border-t border-zinc-100 bg-white py-2 px-3">
-        <Button 
-          size="sm" 
-          className="flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+        <Button
+          size="sm"
+          className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
           onClick={handleCall}
+          aria-label="Llamar"
         >
-          <Phone size={14} />
-          Llamar
+          <Phone size={15} />
+          <span className="hidden sm:inline text-xs font-semibold">Llamar</span>
         </Button>
-        <Button 
-          size="sm" 
-          className="flex items-center gap-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+        <Button
+          size="sm"
+          className="flex items-center justify-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 text-white"
           onClick={handleWhatsApp}
+          aria-label="WhatsApp"
         >
-          <MessageCircle size={16} />
-          WhatsApp
+          <MessageCircle size={15} />
+          <span className="hidden sm:inline text-xs font-semibold">WhatsApp</span>
         </Button>
       </CardFooter>
     </Card>
