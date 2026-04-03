@@ -26,7 +26,7 @@ export function RecuperarContraseña() {
     }
   }, [token]);
 
-  // PASO 1: Solicitar reset
+  // PASO 1: Solicitar reset — el token llega por correo, no en la respuesta
   const handleRequestReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -37,14 +37,7 @@ export function RecuperarContraseña() {
         `${import.meta.env.VITE_API_URL}/forgot-password`,
         { email }
       );
-
       setSuccessMessage(response.data.message);
-
-      setTimeout(() => {
-        navigate(`/recuperar-contraseña?token=${response.data.resetToken}`);
-        setStep("reset");
-        setSuccessMessage(null);
-      }, 2000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setSubmitError(
@@ -183,14 +176,16 @@ export function RecuperarContraseña() {
             <>
               {successMessage ? (
                 <div className="rounded-2xl border border-green-200 bg-green-50 p-6 space-y-4">
-                  <div className="text-center">
+                  <div className="text-center space-y-2">
+                    <CheckCircle className="mx-auto text-green-600" size={40} />
                     <p className="text-sm font-bold text-green-700 uppercase tracking-widest">
                       ✓ Correo enviado
                     </p>
                     <p className="mt-2 text-green-700">{successMessage}</p>
                   </div>
                   <p className="text-xs text-green-600 text-center">
-                    Serás redirigido automáticamente en 2 segundos...
+                    Revisa tu bandeja de entrada (y la carpeta de spam).
+                    El enlace expira en <strong>15 minutos</strong>.
                   </p>
                 </div>
               ) : (

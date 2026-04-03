@@ -1,8 +1,10 @@
 import type { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import pool from '../config/db.ts';
 import type { AuthRequest } from '../middlewares/authMiddleware.ts';
+import { sendResetPasswordEmail } from '../services/emailService.ts';
 
 export const register = async (req: Request, res: Response) => {
   const { nombre, email, password } = req.body;
@@ -84,40 +86,41 @@ export const getMe = async (req: AuthRequest, res: Response) => {
 export const requestPasswordReset = async (req: Request, res: Response) => {
   const { email } = req.body;
 
-  if (!email) {
+  // Respuesta genérica siempre — no se revela si el email existe o no
+  const genericResponse = { message: 'Si el correo está registrado, recibirás instrucciones en breve.' };
+
+  if (!email || typeof email !== 'string') {
     return res.status(400).json({ error: 'El correo es obligatorio.' });
   }
 
   try {
     const userResult = await pool.query(
       'SELECT id FROM usuarios WHERE email = $1',
-      [email]
+      [email.toLowerCase().trim()]
     );
 
     if (!userResult.rows.length) {
-      return res.status(404).json({ error: 'No existe usuario con ese correo.' });
+      // No revelar que el email no existe (previene enumeración de usuarios)
+      return res.status(200).json(genericResponse);
     }
 
-    const resetToken = jwt.sign(
-      { userId: userResult.rows[0].id, email, type: 'password-reset' },
-      process.env.JWT_SECRET || 'secret_key_provisoria',
-      { expiresIn: '1h' }
-    );
-
+    // Token aleatorio de 32 bytes — más seguro que JWT para este caso
+    const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenHash = await bcrypt.hash(resetToken, 10);
-    const expiresAt = new Date(Date.now() + 3600000);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
     await pool.query(
       'UPDATE usuarios SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
       [resetTokenHash, expiresAt, userResult.rows[0].id]
     );
 
-    return res.json({
-      message: 'Se ha enviado un correo con las instrucciones para recuperar tu contraseña.',
-      resetToken
-    });
+    await sendResetPasswordEmail(email, resetToken);
+
+    return res.status(200).json(genericResponse);
   } catch (error) {
-    res.status(500).json({ error: 'Error al procesar la solicitud.' });
+    console.error('Error en requestPasswordReset:', error);
+    // No exponer detalles del error interno
+    return res.status(500).json({ error: 'Error al procesar la solicitud. Intenta de nuevo.' });
   }
 };
 
@@ -128,45 +131,42 @@ export const resetPassword = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Token y nueva contraseña son obligatorios.' });
   }
 
+  if (typeof newPassword !== 'string' || newPassword.length < 6) {
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+  }
+
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'secret_key_provisoria'
-    ) as { userId: number; type: string };
-
-    if (decoded.type !== 'password-reset') {
-      return res.status(400).json({ error: 'Token inválido.' });
-    }
-
     const userResult = await pool.query(
-      'SELECT reset_token, reset_token_expires FROM usuarios WHERE id = $1',
-      [decoded.userId]
+      'SELECT id, reset_token, reset_token_expires FROM usuarios WHERE reset_token IS NOT NULL',
+      []
     );
 
-    if (!userResult.rows.length) {
-      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    // Buscar el usuario cuyo hash coincide con el token recibido
+    let matchedUser: { id: number; reset_token: string; reset_token_expires: Date } | null = null;
+    for (const row of userResult.rows) {
+      if (await bcrypt.compare(token, row.reset_token)) {
+        matchedUser = row;
+        break;
+      }
     }
 
-    const user = userResult.rows[0];
-    if (!user.reset_token || new Date() > new Date(user.reset_token_expires)) {
-      return res.status(400).json({ error: 'El token ha expirado. Solicita uno nuevo.' });
-    }
-
-    if (!(await bcrypt.compare(token, user.reset_token))) {
+    if (!matchedUser) {
       return res.status(400).json({ error: 'Token inválido.' });
+    }
+
+    if (new Date() > new Date(matchedUser.reset_token_expires)) {
+      return res.status(400).json({ error: 'El enlace ha expirado. Solicita uno nuevo.' });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await pool.query(
       'UPDATE usuarios SET password = $1, reset_token = NULL, reset_token_expires = NULL WHERE id = $2',
-      [hashedPassword, decoded.userId]
+      [hashedPassword, matchedUser.id]
     );
 
-    return res.json({ message: 'Contraseña actualizada exitosamente.' });
+    return res.status(200).json({ message: 'Contraseña actualizada exitosamente.' });
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(400).json({ error: 'Token inválido o expirado.' });
-    }
-    res.status(500).json({ error: 'Error al resetear la contraseña.' });
+    console.error('Error en resetPassword:', error);
+    return res.status(500).json({ error: 'Error al restablecer la contraseña.' });
   }
 };
