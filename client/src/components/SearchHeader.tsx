@@ -53,7 +53,11 @@ const calculateMatchScore = (text: string, query: string): number => {
   return score;
 };
 
-export function SearchHeader() {
+interface SearchHeaderProps {
+  className?: string;
+}
+
+export function SearchHeader({ className }: SearchHeaderProps) {
   const navigate = useNavigate();
   const [input, setInput] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -173,7 +177,7 @@ export function SearchHeader() {
 
   return (
     <form
-      className="hidden max-w-md flex-1 items-center lg:flex relative"
+      className={className ?? "flex w-full items-center relative"}
       role="search"
       onSubmit={(e) => {
         e.preventDefault();

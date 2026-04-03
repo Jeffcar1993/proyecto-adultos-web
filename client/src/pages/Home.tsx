@@ -83,28 +83,27 @@ export function Home() {
       )}
       
           {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-zinc-50 py-16 md:py-24 border-b">
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
+      <section className="relative overflow-hidden bg-zinc-50 py-10 md:py-16 lg:py-24 border-b">
+        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           
           {/* COLUMNA IZQUIERDA - Contenido */}
-          <div className="relative z-10 space-y-8"> {/* Añadido z-10 para asegurar que esté arriba */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-1.5 text-sm font-bold text-red-600 border border-red-100 uppercase tracking-widest">
-              <Sparkles size={14} /> Contenido Verificado +18
+          <div className="relative z-10 space-y-6 md:space-y-8">
+            <div className="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-1.5 text-xs font-bold text-red-600 border border-red-100 uppercase tracking-widest">
+              <Sparkles size={12} /> Contenido Verificado +18
             </div>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-zinc-950">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] text-zinc-950">
               ENCUENTRA <br />
               <span className="text-red-600 italic">PLACER</span> REAL
             </h1>
-            <p className="text-xl text-zinc-600 max-w-lg leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-zinc-600 max-w-lg leading-relaxed">
               La plataforma más discreta y profesional de Colombia. Perfiles 100% reales con contacto directo.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* IMPORTANTE: Usa asChild para que el cursor funcione correctamente con el Link */}
-              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 h-14 text-lg font-bold shadow-lg shadow-blue-200 cursor-pointer">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 h-12 sm:h-14 text-base sm:text-lg font-bold shadow-lg shadow-blue-200 cursor-pointer">
                 <Link to="/perfiles">Explorar Ahora</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-full px-8 h-14 text-lg border-zinc-300 bg-white hover:bg-zinc-50 cursor-pointer">
+              <Button asChild size="lg" variant="outline" className="rounded-full px-8 h-12 sm:h-14 text-base sm:text-lg border-zinc-300 bg-white hover:bg-zinc-50 cursor-pointer">
                 <Link to="/crear-cuenta">Publicar Anuncio</Link>
               </Button>
             </div>
@@ -126,23 +125,23 @@ export function Home() {
       </section>
 
       {/* CIUDADES - Diseño de Galería Minimalista */}
-      <section className="py-20 container mx-auto px-4">
-        <div className="flex justify-between items-end mb-10">
+      <section className="py-12 md:py-20 container mx-auto px-4">
+        <div className="flex justify-between items-end mb-8 md:mb-10">
           <div>
-            <h2 className="text-3xl font-black uppercase tracking-tight">Ciudades Top</h2>
-            <p className="text-zinc-500">Selecciona tu ubicación actual</p>
+            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight">Ciudades Top</h2>
+            <p className="text-sm md:text-base text-zinc-500">Selecciona tu ubicación actual</p>
           </div>
           <Button asChild variant="link" className="text-blue-600 font-bold">
             <Link to="/perfiles">Ver todas <ArrowRight size={16} className="ml-2" /></Link>
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
           {cities.map((city) => (
             <Link
               to={`/perfiles?ciudad=${encodeURIComponent(city.name)}`}
               key={city.name}
-              className="group relative h-[400px] overflow-hidden rounded-3xl bg-zinc-200"
+              className="group relative h-[160px] sm:h-[240px] md:h-[360px] lg:h-[400px] overflow-hidden rounded-2xl md:rounded-3xl bg-zinc-200"
             >
               <img
                 src={city.image}
@@ -150,9 +149,9 @@ export function Home() {
                 alt={city.name}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-              <div className="absolute bottom-8 left-8">
-                <p className="text-red-500 font-bold text-sm uppercase tracking-widest">{city.count}</p>
-                <h3 className="text-4xl font-black text-white">{city.name}</h3>
+              <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8">
+                <p className="text-red-400 font-bold text-[10px] sm:text-xs uppercase tracking-widest">{city.count}</p>
+                <h3 className="text-xl sm:text-2xl md:text-4xl font-black text-white">{city.name}</h3>
               </div>
             </Link>
           ))}
@@ -160,28 +159,37 @@ export function Home() {
       </section>
 
       {/* FEATURES - Limpieza y Seguridad */}
-      <section className="bg-zinc-950 py-20 text-white">
-        <div className="container mx-auto px-4 grid md:grid-cols-3 gap-12">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="h-16 w-16 bg-blue-600/20 rounded-2xl flex items-center justify-center text-blue-500">
-              <BadgeCheck size={32} />
+      <section className="bg-zinc-950 py-14 md:py-20 text-white">
+        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          <div className="flex flex-row md:flex-col items-center md:items-center gap-4 md:gap-0 md:text-center md:space-y-4">
+            <div className="h-12 w-12 shrink-0 md:h-16 md:w-16 bg-blue-600/20 rounded-2xl flex items-center justify-center text-blue-500">
+              <BadgeCheck size={24} className="md:hidden" />
+              <BadgeCheck size={32} className="hidden md:block" />
             </div>
-            <h3 className="text-xl font-bold">Verificación Total</h3>
-            <p className="text-zinc-400">Garantizamos que las fotos corresponden a la realidad de cada perfil.</p>
+            <div>
+              <h3 className="text-base md:text-xl font-bold">Verificación Total</h3>
+              <p className="text-sm text-zinc-400 mt-1">Garantizamos que las fotos corresponden a la realidad de cada perfil.</p>
+            </div>
           </div>
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="h-16 w-16 bg-red-600/20 rounded-2xl flex items-center justify-center text-red-500">
-              <ShieldCheck size={32} />
+          <div className="flex flex-row md:flex-col items-center md:items-center gap-4 md:gap-0 md:text-center md:space-y-4">
+            <div className="h-12 w-12 shrink-0 md:h-16 md:w-16 bg-red-600/20 rounded-2xl flex items-center justify-center text-red-500">
+              <ShieldCheck size={24} className="md:hidden" />
+              <ShieldCheck size={32} className="hidden md:block" />
             </div>
-            <h3 className="text-xl font-bold">Privacidad Absoluta</h3>
-            <p className="text-zinc-400">Tus datos y búsquedas están protegidos y encriptados.</p>
+            <div>
+              <h3 className="text-base md:text-xl font-bold">Privacidad Absoluta</h3>
+              <p className="text-sm text-zinc-400 mt-1">Tus datos y búsquedas están protegidos y encriptados.</p>
+            </div>
           </div>
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="h-16 w-16 bg-green-600/20 rounded-2xl flex items-center justify-center text-green-500">
-              <Search size={32} />
+          <div className="flex flex-row md:flex-col items-center md:items-center gap-4 md:gap-0 md:text-center md:space-y-4">
+            <div className="h-12 w-12 shrink-0 md:h-16 md:w-16 bg-green-600/20 rounded-2xl flex items-center justify-center text-green-500">
+              <Search size={24} className="md:hidden" />
+              <Search size={32} className="hidden md:block" />
             </div>
-            <h3 className="text-xl font-bold">Búsqueda Inteligente</h3>
-            <p className="text-zinc-400">Filtra por gustos, servicios y cercanía de forma inmediata.</p>
+            <div>
+              <h3 className="text-base md:text-xl font-bold">Búsqueda Inteligente</h3>
+              <p className="text-sm text-zinc-400 mt-1">Filtra por gustos, servicios y cercanía de forma inmediata.</p>
+            </div>
           </div>
         </div>
       </section>
