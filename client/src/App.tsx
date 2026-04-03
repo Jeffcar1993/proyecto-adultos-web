@@ -19,6 +19,7 @@ import { ControlParental } from "@/pages/ControlParental"
 import { CookiesPage } from "@/pages/CookiesPage"
 import { PoliticaPagos } from "@/pages/PoliticaPagos"
 import { PoliticaPrivacidad } from "@/pages/PoliticaPrivacidad"
+import { NotFound } from "@/pages/NotFound"
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -53,6 +54,7 @@ function App() {
             <Route path="/politica-pagos" element={<PoliticaPagos />} />
             <Route path="/contacto" element={<ContactoPage />} />
             <Route path="/control-parental" element={<ControlParental />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
 
