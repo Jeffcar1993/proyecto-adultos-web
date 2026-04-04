@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom"
-import { LogIn, LogOut, UserCircle, UserPlus } from "lucide-react"
+import { LogIn, LogOut, UserCircle, UserPlus, Coins, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SearchHeader } from "@/components/SearchHeader"
 import { useAuth } from "@/context/useAuth"
 import { useNavigate } from "react-router-dom"
 
 export function SiteHeader() {
-  const { token, logout } = useAuth()
+  const { token, user, logout } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -76,6 +76,22 @@ export function SiteHeader() {
             ) : (
               <>
                 {/* Desktop */}
+                {user?.is_admin && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="hidden h-10 rounded-full border-amber-300 px-4 text-sm font-bold text-amber-600 hover:bg-amber-50 md:inline-flex"
+                  >
+                    <Link to="/admin/ordenes"><ShieldCheck size={15} className="mr-1.5" />Admin</Link>
+                  </Button>
+                )}
+                <Button
+                  asChild
+                  variant="outline"
+                  className="hidden h-10 rounded-full border-zinc-200 px-4 text-sm font-bold text-zinc-700 hover:bg-zinc-50 md:inline-flex"
+                >
+                  <Link to="/billetera"><Coins size={15} className="mr-1.5" />Billetera</Link>
+                </Button>
                 <Button
                   asChild
                   className="hidden h-10 rounded-full bg-blue-600 px-5 text-sm font-bold text-white shadow-md shadow-blue-200 hover:bg-blue-700 md:inline-flex"
@@ -90,6 +106,22 @@ export function SiteHeader() {
                 </Button>
 
                 {/* Móvil */}
+                {user?.is_admin && (
+                  <Link
+                    to="/admin/ordenes"
+                    className="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-amber-300 text-amber-600 hover:bg-amber-50"
+                    aria-label="Admin"
+                  >
+                    <ShieldCheck size={18} />
+                  </Link>
+                )}
+                <Link
+                  to="/billetera"
+                  className="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-700 hover:bg-zinc-50"
+                  aria-label="Billetera"
+                >
+                  <Coins size={18} />
+                </Link>
                 <Link
                   to="/mi-perfil"
                   className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white shadow-md shadow-blue-200"

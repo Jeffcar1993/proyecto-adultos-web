@@ -20,6 +20,8 @@ import { CookiesPage } from "@/pages/CookiesPage"
 import { PoliticaPagos } from "@/pages/PoliticaPagos"
 import { PoliticaPrivacidad } from "@/pages/PoliticaPrivacidad"
 import { NotFound } from "@/pages/NotFound"
+import { Billetera } from "@/pages/Billetera"
+import { AdminOrdenes } from "@/pages/AdminOrdenes"
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -44,6 +46,8 @@ function App() {
             <Route path="/perfiles" element={<TodosPerfiles />} />
             <Route path="/perfil/:id" element={<PerfilDetalle />} />
             <Route path="/mi-perfil" element={<ProtectedRoute><MiPerfil /></ProtectedRoute>} />
+            <Route path="/billetera" element={<ProtectedRoute><Billetera /></ProtectedRoute>} />
+            <Route path="/admin/ordenes" element={<ProtectedRoute><AdminOrdenes /></ProtectedRoute>} />
             <Route path="/nuevo" element={<ProtectedRoute><FormularioPerfil /></ProtectedRoute>} />
             <Route path="/iniciar-sesion" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
             <Route path="/crear-cuenta" element={<PublicOnlyRoute><CrearCuenta /></PublicOnlyRoute>} />

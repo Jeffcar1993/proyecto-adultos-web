@@ -238,3 +238,69 @@ export async function migrateUsuarios() {
     console.error('❌ Error en migración de usuarios:', error);
   }
 }
+
+export async function migrateTokens() {
+  try {
+    let changesApplied = 0;
+
+    // 1. Columna saldo_tokens en usuarios
+    const checkSaldo = await queryWithRetry(
+      "SELECT column_name FROM information_schema.columns WHERE table_name='usuarios' AND column_name='saldo_tokens';"
+    );
+    if (checkSaldo.rows.length === 0) {
+      await queryWithRetry("ALTER TABLE usuarios ADD COLUMN saldo_tokens INTEGER NOT NULL DEFAULT 0;");
+      changesApplied++;
+    }
+
+    // 2. Columna is_admin en usuarios
+    const checkAdmin = await queryWithRetry(
+      "SELECT column_name FROM information_schema.columns WHERE table_name='usuarios' AND column_name='is_admin';"
+    );
+    if (checkAdmin.rows.length === 0) {
+      await queryWithRetry("ALTER TABLE usuarios ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT FALSE;");
+      changesApplied++;
+    }
+
+    // 3. Tabla paquetes_tokens
+    await queryWithRetry(`
+      CREATE TABLE IF NOT EXISTS paquetes_tokens (
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(50) NOT NULL,
+        cantidad_tokens INTEGER NOT NULL,
+        precio_cop DECIMAL(10, 2) NOT NULL,
+        activo BOOLEAN DEFAULT TRUE
+      );
+    `);
+
+    // 4. Tabla ordenes_compra
+    await queryWithRetry(`
+      CREATE TABLE IF NOT EXISTS ordenes_compra (
+        id SERIAL PRIMARY KEY,
+        usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
+        paquete_id INTEGER REFERENCES paquetes_tokens(id),
+        monto_total DECIMAL(10, 2) NOT NULL,
+        estado VARCHAR(20) NOT NULL DEFAULT 'pendiente',
+        url_comprobante TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 5. Seed de paquetes iniciales (solo si la tabla está vacía)
+    const countPaquetes = await queryWithRetry("SELECT COUNT(*) FROM paquetes_tokens;");
+    if (parseInt(countPaquetes.rows[0].count, 10) === 0) {
+      await queryWithRetry(`
+        INSERT INTO paquetes_tokens (nombre, cantidad_tokens, precio_cop) VALUES
+        ('Pack Básico', 5, 10000.00),
+        ('Pack Estándar', 12, 20000.00),
+        ('Pack Premium', 35, 50000.00);
+      `);
+      changesApplied++;
+    }
+
+    if (changesApplied > 0) {
+      console.log(`✅ Migración tokens aplicada: ${changesApplied}`);
+    }
+  } catch (error) {
+    console.error('❌ Error en migración de tokens:', error);
+  }
+}

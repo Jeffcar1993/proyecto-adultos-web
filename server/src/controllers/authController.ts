@@ -34,7 +34,7 @@ export const register = async (req: Request, res: Response) => {
     res.status(201).json({
       message: 'Usuario creado',
       token,
-      user: newUser,
+      user: { ...newUser, is_admin: false },
     });
   } catch (error) {
     res.status(500).json({ error: "El email ya existe o error de servidor" });
@@ -44,7 +44,7 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
-    const result = await pool.query('SELECT id, nombre, email, password FROM usuarios WHERE email = $1', [email]);
+    const result = await pool.query('SELECT id, nombre, email, password, is_admin FROM usuarios WHERE email = $1', [email]);
     const user = result.rows[0];
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -58,7 +58,7 @@ export const login = async (req: Request, res: Response) => {
       { expiresIn: '24h' }
     );
 
-    res.json({ token, user: { id: user.id, nombre: user.nombre, email: user.email } });
+    res.json({ token, user: { id: user.id, nombre: user.nombre, email: user.email, is_admin: user.is_admin ?? false } });
   } catch (error) {
     res.status(500).json({ error: "Error en el login" });
   }
@@ -71,7 +71,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
     }
 
     const result = await pool.query(
-      'SELECT id, nombre, email FROM usuarios WHERE id = $1',
+      'SELECT id, nombre, email, is_admin FROM usuarios WHERE id = $1',
       [req.userId]
     );
 
@@ -211,7 +211,7 @@ export const googleAuth = async (req: Request, res: Response) => {
 
     // Buscar usuario existente por google_id o email
     let userResult = await pool.query(
-      'SELECT id, nombre, email, google_id FROM usuarios WHERE google_id = $1 OR email = $2',
+      'SELECT id, nombre, email, google_id, is_admin FROM usuarios WHERE google_id = $1 OR email = $2',
       [googleId, email]
     );
 
@@ -237,7 +237,7 @@ export const googleAuth = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       token,
-      user: { id: user.id, nombre: user.nombre, email: user.email },
+      user: { id: user.id, nombre: user.nombre, email: user.email, is_admin: user.is_admin ?? false },
     });
   } catch (error) {
     console.error('Error en googleAuth:', error);

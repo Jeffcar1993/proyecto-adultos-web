@@ -47,6 +47,7 @@ export function MiPerfil() {
             id: userData.id,
             nombre: userData.nombre ?? null,
             email: userData.email,
+            is_admin: userData.is_admin ?? false,
           });
         }
 

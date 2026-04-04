@@ -4,6 +4,7 @@ export interface AuthUser {
   id: number;
   nombre: string | null;
   email: string;
+  is_admin?: boolean;
 }
 
 export interface AuthContextType {
