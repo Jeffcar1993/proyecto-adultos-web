@@ -198,24 +198,24 @@ export function MiPerfil() {
           ) : (
             <div className="mt-4 space-y-3">
               {anuncios.map((anuncio) => (
-                <div key={anuncio.id} className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-3">
+                <div key={anuncio.id} className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-white p-4">
+                  <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={anuncio.foto_principal || "/placeholder-user.png"}
                       alt={anuncio.nombre}
-                      className="h-14 w-14 rounded-xl object-cover"
+                      className="h-14 w-14 shrink-0 rounded-xl object-cover"
                     />
-                    <div>
-                      <p className="font-bold text-zinc-900">{anuncio.nombre}</p>
-                      <p className="text-sm text-zinc-500">{anuncio.ciudad}, {anuncio.departamento}</p>
+                    <div className="min-w-0">
+                      <p className="truncate font-bold text-zinc-900">{anuncio.nombre}</p>
+                      <p className="truncate text-sm text-zinc-500">{anuncio.ciudad}, {anuncio.departamento}</p>
                     </div>
                   </div>
 
                   {/* Botones de acción */}
-                  <div className="flex items-center gap-2 sm:ml-auto">
+                  <div className="flex shrink-0 items-center gap-2">
                     {confirmDeleteId === anuncio.id ? (
                       <>
-                        <span className="text-xs font-bold text-red-600">¿Eliminar?</span>
+                        <span className="hidden text-xs font-bold text-red-600 sm:inline">¿Eliminar?</span>
                         <button
                           onClick={() => handleEliminarAnuncio(anuncio.id)}
                           disabled={deletingId === anuncio.id}
