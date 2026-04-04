@@ -7,6 +7,8 @@ export const crearPerfil = async (req: AuthRequest, res: Response) => {
   const { nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp, edad } = req.body;
   const usuario_id = req.userId; // Obtenido del Token
 
+  const client = await pool.connect();
+
   try {
     if (!usuario_id) {
       return res.status(401).json({ error: 'No autenticado.' });
@@ -18,10 +20,23 @@ export const crearPerfil = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Debes subir al menos una foto.' });
     }
 
+    // Verificar saldo de tokens antes de subir fotos
+    const saldoResult = await client.query(
+      'SELECT saldo_tokens FROM usuarios WHERE id = $1 FOR UPDATE',
+      [usuario_id]
+    );
+    const saldo: number = saldoResult.rows[0]?.saldo_tokens ?? 0;
+    if (saldo < 1) {
+      client.release();
+      return res.status(402).json({ error: 'Saldo insuficiente. Necesitas al menos 1 token para publicar un anuncio.' });
+    }
+
     const fotosUrls = await Promise.all(
       files.map((file) => uploadToCloudinary(file.buffer, 'perfiles_adultos'))
     );
     const fotoPrincipal = fotosUrls[0];
+
+    await client.query('BEGIN');
 
     const query = `
       INSERT INTO perfiles 
@@ -30,14 +45,23 @@ export const crearPerfil = async (req: AuthRequest, res: Response) => {
       RETURNING *;
     `;
 
-    const result = await pool.query(query, [
+    const result = await client.query(query, [
       nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp,
       edad ? parseInt(edad) : null,
       usuario_id, fotosUrls, fotoPrincipal
     ]);
 
+    // Descontar 1 token
+    await client.query(
+      'UPDATE usuarios SET saldo_tokens = saldo_tokens - 1 WHERE id = $1',
+      [usuario_id]
+    );
+
+    await client.query('COMMIT');
+
     res.status(201).json(result.rows[0]);
   } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
     if (
       typeof error === 'object' &&
       error !== null &&
@@ -51,6 +75,8 @@ export const crearPerfil = async (req: AuthRequest, res: Response) => {
 
     console.error(error);
     res.status(500).json({ error: "Error al crear el perfil" });
+  } finally {
+    client.release();
   }
 };
 

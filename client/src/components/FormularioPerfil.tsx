@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { perfilSchema, type PerfilFormValues } from "@/schema/perfilSchema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Loader2, Camera, MapPin, Smartphone, User, X } from "lucide-react";
+import { Loader2, Camera, MapPin, Smartphone, User, X, Coins, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/context/useAuth";
 
 // Importación de datos geográficos
@@ -21,6 +21,7 @@ export function FormularioPerfil() {
   const [photoItems, setPhotoItems] = useState<{ file: File; url: string }[]>([]);
   const [ciudadesDisponibles, setCiudadesDisponibles] = useState<string[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [saldo, setSaldo] = useState<number | null>(null);
 
   const form = useForm<PerfilFormValues>({
     resolver: zodResolver(perfilSchema),
@@ -37,6 +38,17 @@ export function FormularioPerfil() {
       fotos: undefined,
     },
   });
+
+  // Verificar saldo de tokens al montar
+  useEffect(() => {
+    if (!token) return;
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/tokens/billetera`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setSaldo(res.data.saldo ?? 0))
+      .catch(() => setSaldo(0));
+  }, [token]);
 
   // Observar el cambio de departamento para filtrar ciudades
   const departamentoElegido = form.watch("departamento") as string;
@@ -114,7 +126,8 @@ export function FormularioPerfil() {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
+      setSaldo((prev) => (prev !== null ? prev - 1 : null));
       photoItems.forEach((item) => URL.revokeObjectURL(item.url));
       setPhotoItems([]);
       form.reset();
@@ -126,6 +139,8 @@ export function FormularioPerfil() {
           setSubmitError("Tu sesión expiró o no es válida. Inicia sesión nuevamente.");
         } else if (error.response?.status === 400) {
           setSubmitError((error.response.data as { error?: string })?.error ?? "Datos incompletos para publicar el anuncio.");
+        } else if (error.response?.status === 402) {
+          setSubmitError("No tienes tokens suficientes. Recarga tu billetera para publicar.");
         } else if (error.response?.status === 409) {
           setSubmitError((error.response.data as { error?: string })?.error ?? "Ya tienes un perfil publicado con esta cuenta.");
         } else {
@@ -139,6 +154,28 @@ export function FormularioPerfil() {
     }
   }
 
+  // Sin saldo → redirigir a billetera
+  if (saldo !== null && saldo < 1) {
+    return (
+      <div className="max-w-3xl mx-auto p-4 md:p-8">
+        <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-500">
+              <Coins size={32} />
+            </div>
+          </div>
+          <h2 className="text-2xl font-black text-zinc-900">Necesitas tokens para publicar</h2>
+          <p className="text-zinc-600 max-w-sm mx-auto">
+            Publicar un anuncio cuesta <strong>1 token</strong>. Actualmente tienes <strong>0 tokens</strong> en tu billetera.
+          </p>
+          <Button asChild className="rounded-full bg-zinc-900 text-white hover:bg-zinc-700 font-bold px-8">
+            <Link to="/billetera">Ir a Recargar Tokens</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl mx-auto p-4 md:p-8">
       <div className="mb-10">
@@ -146,7 +183,23 @@ export function FormularioPerfil() {
           Configurar Anuncio
         </h1>
         <p className="text-zinc-500">Completa los detalles para que los clientes te encuentren.</p>
+        {saldo !== null && (
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-zinc-100 px-4 py-1.5 text-sm font-bold text-zinc-700">
+            <Coins size={14} className="text-yellow-500" />
+            Tienes {saldo} token{saldo !== 1 ? "s" : ""} · Publicar cuesta 1 token
+          </div>
+        )}
       </div>
+
+      {saldo !== null && saldo === 1 && (
+        <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <AlertTriangle size={18} className="shrink-0 text-amber-500 mt-0.5" />
+          <p className="text-sm text-amber-800">
+            <strong>Último token disponible.</strong> Al publicar este anuncio tu saldo quedará en 0.{" "}
+            <Link to="/billetera" className="underline font-bold">Recargar ahora</Link>
+          </p>
+        </div>
+      )}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
