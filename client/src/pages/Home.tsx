@@ -11,12 +11,12 @@ import cartagenaImage from "@/img/cartagena.jpg";
 import bucaramangaImage from "@/img/bucaramanga.jpeg";
 
 const cities = [
-  { name: "Bogotá", count: "+120 perfiles", image: bogotaImage },
-  { name: "Medellín", count: "+80 perfiles", image: medellinImage },
-  { name: "Cali", count: "+45 perfiles", image: caliImage },
-  { name: "Barranquilla", count: "+30 perfiles", image: barranquillaImage },
-  { name: "Cartagena", count: "+25 perfiles", image: cartagenaImage },
-  { name: "Bucaramanga", count: "+15 perfiles", image: bucaramangaImage },
+  { name: "Bogotá", urlName: "Bogotá D.C.", count: "+120 perfiles", image: bogotaImage },
+  { name: "Medellín", urlName: "Medellín", count: "+80 perfiles", image: medellinImage },
+  { name: "Cali", urlName: "Cali", count: "+45 perfiles", image: caliImage },
+  { name: "Barranquilla", urlName: "Barranquilla", count: "+30 perfiles", image: barranquillaImage },
+  { name: "Cartagena", urlName: "Cartagena", count: "+25 perfiles", image: cartagenaImage },
+  { name: "Bucaramanga", urlName: "Bucaramanga", count: "+15 perfiles", image: bucaramangaImage },
 ];
 
 export function Home() {
@@ -139,7 +139,7 @@ export function Home() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
           {cities.map((city) => (
             <Link
-              to={`/perfiles?ciudad=${encodeURIComponent(city.name)}`}
+              to={`/perfiles?ciudad=${encodeURIComponent(city.urlName)}`}
               key={city.name}
               className="group relative h-[160px] sm:h-[240px] md:h-[360px] lg:h-[400px] overflow-hidden rounded-2xl md:rounded-3xl bg-zinc-200"
             >
