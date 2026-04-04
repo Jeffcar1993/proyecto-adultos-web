@@ -36,4 +36,19 @@ export const uploadToCloudinary = (fileBuffer: Buffer, folder: string): Promise<
   });
 };
 
+/**
+ * Elimina una imagen de Cloudinary a partir de su URL segura
+ * Extrae el public_id del path de la URL (incluyendo la carpeta)
+ */
+export const deleteFromCloudinary = (url: string): Promise<void> => {
+  const uploadIndex = url.indexOf('/upload/');
+  if (uploadIndex === -1) return Promise.resolve();
+  const afterUpload = url.slice(uploadIndex + 8);
+  const withoutVersion = afterUpload.replace(/^v\d+\//, '');
+  const publicId = withoutVersion.replace(/\.[^.]+$/, '');
+  return new Promise((resolve) => {
+    cloudinary.uploader.destroy(publicId, () => resolve()); // best effort
+  });
+};
+
 export default cloudinary;

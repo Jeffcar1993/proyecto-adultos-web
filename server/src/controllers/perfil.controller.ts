@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import pool from '../config/db.ts';
-import { uploadToCloudinary } from '../config/cloudinary.ts';
+import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary.ts';
 import type { AuthRequest } from '../middlewares/authMiddleware.ts';
 
 export const crearPerfil = async (req: AuthRequest, res: Response) => {
@@ -175,5 +175,89 @@ export const getMisPerfiles = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Error en getMisPerfiles:', error);
     return res.status(500).json({ error: 'Error al obtener tus anuncios' });
+  }
+};
+
+export const eliminarPerfil = async (req: AuthRequest, res: Response) => {
+  const perfilId = parseInt(String(req.params.id), 10);
+  const userId = req.userId;
+
+  if (!userId) return res.status(401).json({ error: 'No autenticado.' });
+  if (isNaN(perfilId)) return res.status(400).json({ error: 'ID inválido.' });
+
+  try {
+    // Obtener fotos antes de borrar para poder eliminarlas de Cloudinary
+    const result = await pool.query(
+      'SELECT fotos FROM perfiles WHERE id = $1 AND usuario_id = $2',
+      [perfilId, userId]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({ error: 'Anuncio no encontrado o no autorizado.' });
+    }
+
+    const fotos: string[] = result.rows[0].fotos ?? [];
+
+    await pool.query('DELETE FROM perfiles WHERE id = $1', [perfilId]);
+
+    // Eliminar imágenes de Cloudinary (best effort)
+    await Promise.allSettled(fotos.map((url) => deleteFromCloudinary(url)));
+
+    return res.status(200).json({ message: 'Anuncio eliminado.' });
+  } catch (error) {
+    console.error('Error en eliminarPerfil:', error);
+    return res.status(500).json({ error: 'Error al eliminar el anuncio.' });
+  }
+};
+
+export const subirPerfil = async (req: AuthRequest, res: Response) => {
+  const perfilId = parseInt(String(req.params.id), 10);
+  const userId = req.userId;
+
+  if (!userId) return res.status(401).json({ error: 'No autenticado.' });
+  if (isNaN(perfilId)) return res.status(400).json({ error: 'ID inválido.' });
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Lock atómico sobre el saldo del usuario
+    const saldoResult = await client.query(
+      'SELECT saldo_tokens FROM usuarios WHERE id = $1 FOR UPDATE',
+      [userId]
+    );
+    const saldo: number = saldoResult.rows[0]?.saldo_tokens ?? 0;
+    if (saldo < 1) {
+      await client.query('ROLLBACK');
+      return res.status(402).json({ error: 'Saldo insuficiente. Necesitas 1 token para subir el anuncio.' });
+    }
+
+    // Verificar que el perfil pertenece al usuario
+    const perfilResult = await client.query(
+      'SELECT id FROM perfiles WHERE id = $1 AND usuario_id = $2',
+      [perfilId, userId]
+    );
+    if (!perfilResult.rows.length) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Anuncio no encontrado o no autorizado.' });
+    }
+
+    // Actualizar created_at a ahora → queda de primero en el listado
+    await client.query('UPDATE perfiles SET created_at = NOW() WHERE id = $1', [perfilId]);
+
+    // Descontar 1 token
+    await client.query(
+      'UPDATE usuarios SET saldo_tokens = saldo_tokens - 1 WHERE id = $1',
+      [userId]
+    );
+
+    await client.query('COMMIT');
+    return res.status(200).json({ message: 'Anuncio subido al tope.' });
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    console.error('Error en subirPerfil:', error);
+    return res.status(500).json({ error: 'Error al subir el anuncio.' });
+  } finally {
+    client.release();
   }
 };

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { crearPerfil, getMisPerfiles, getPerfilById, getPerfiles } from '../controllers/perfil.controller.ts';
+import { crearPerfil, eliminarPerfil, getMisPerfiles, getPerfilById, getPerfiles, subirPerfil } from '../controllers/perfil.controller.ts';
 import { upload } from '../middlewares/multer.ts';
 import { authenticateToken } from '../middlewares/authMiddleware.ts';
 
@@ -12,5 +12,7 @@ router.get('/:id', getPerfilById);
 
 // Rutas de perfiles protegidas (requieren autenticación)
 router.post('/', authenticateToken, upload.array('fotos', 5), crearPerfil);
+router.delete('/:id', authenticateToken, eliminarPerfil);
+router.post('/:id/subir', authenticateToken, subirPerfil);
 
 export default router;
