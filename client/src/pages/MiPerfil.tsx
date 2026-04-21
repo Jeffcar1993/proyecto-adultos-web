@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/useAuth";
-import { AlertTriangle, ArrowUp, Check, Coins, Loader2, Trash2, X } from "lucide-react";
+import { AlertTriangle, ArrowUp, Check, Coins, Loader2, ShieldCheck, Trash2, X } from "lucide-react";
 import axios from "axios";
 
 interface Anuncio {
@@ -13,6 +13,7 @@ interface Anuncio {
   foto_principal: string | null;
   ciudad: string;
   departamento: string;
+  verificado: boolean;
 }
 
 export function MiPerfil() {
@@ -33,6 +34,8 @@ export function MiPerfil() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [subirModal, setSubirModal] = useState<number | null>(null);
   const [subirLoading, setSubirLoading] = useState(false);
+  const [verificarModal, setVerificarModal] = useState<number | null>(null);
+  const [verificarLoading, setVerificarLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,6 +120,30 @@ export function MiPerfil() {
       }
     } finally {
       setSubirLoading(false);
+    }
+  };
+
+  const handleVerificarAnuncio = async () => {
+    if (verificarModal === null) return;
+    setVerificarLoading(true);
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/perfiles/${verificarModal}/verificar`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSaldo((prev) => (prev !== null ? prev - 1 : null));
+      setAnuncios((prev) =>
+        prev.map((a) => (a.id === verificarModal ? { ...a, verificado: true } : a))
+      );
+      setVerificarModal(null);
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 402) {
+        setVerificarModal(null);
+        navigate("/billetera");
+      }
+    } finally {
+      setVerificarLoading(false);
     }
   };
 
@@ -206,7 +233,14 @@ export function MiPerfil() {
                       className="h-14 w-14 shrink-0 rounded-xl object-cover"
                     />
                     <div className="min-w-0">
-                      <p className="truncate font-bold text-zinc-900">{anuncio.nombre}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="truncate font-bold text-zinc-900">{anuncio.nombre}</p>
+                        {anuncio.verificado && (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-black text-white">
+                            <ShieldCheck size={10} /> Verificado
+                          </span>
+                        )}
+                      </div>
                       <p className="truncate text-sm text-zinc-500">{anuncio.ciudad}, {anuncio.departamento}</p>
                     </div>
                   </div>
@@ -237,6 +271,15 @@ export function MiPerfil() {
                       </>
                     ) : (
                       <>
+                        {!anuncio.verificado && (
+                          <button
+                            onClick={() => setVerificarModal(anuncio.id)}
+                            title="Verificar perfil (cuesta 1 token)"
+                            className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-50"
+                          >
+                            <ShieldCheck size={15} />
+                          </button>
+                        )}
                         <button
                           onClick={() => {
                             if (saldo !== null && saldo < 1) {
@@ -267,6 +310,89 @@ export function MiPerfil() {
         </div>
       </div>
     </div>
+
+    {/* MODAL: Verificar perfil */}
+    {verificarModal !== null && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={() => !verificarLoading && setVerificarModal(null)}
+        />
+        <div className="relative w-full max-w-sm rounded-3xl bg-white shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-blue-600 px-6 py-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <ShieldCheck size={20} className="text-white" />
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">Verificar Perfil</h2>
+            </div>
+            {!verificarLoading && (
+              <button onClick={() => setVerificarModal(null)} className="text-white/70 hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+            )}
+          </div>
+          <div className="px-6 py-6 space-y-4">
+            <div className="flex items-center gap-3 rounded-2xl bg-zinc-50 border border-zinc-200 px-4 py-3">
+              <Coins size={18} className="text-yellow-500 shrink-0" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Tu saldo actual</p>
+                <p className={`text-lg font-black ${saldo === 0 ? "text-red-600" : "text-zinc-900"}`}>
+                  {saldo ?? "..."} token{saldo !== 1 ? "s" : ""}
+                </p>
+              </div>
+            </div>
+
+            {saldo !== null && saldo < 1 ? (
+              <>
+                <p className="text-sm font-semibold text-red-600">
+                  No tienes tokens suficientes para verificar este perfil.
+                </p>
+                <Button
+                  asChild
+                  className="w-full h-12 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700"
+                >
+                  <Link to="/billetera" onClick={() => setVerificarModal(null)}>Ir a Recargar Tokens</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="rounded-2xl bg-blue-50 border border-blue-100 p-4 space-y-1">
+                  <p className="text-sm font-bold text-blue-800">¿Qué incluye la verificación?</p>
+                  <ul className="text-sm text-blue-700 space-y-1 mt-2 list-none">
+                    <li>• Insignia de escudo visible en tu anuncio</li>
+                    <li>• Mayor confianza de los visitantes</li>
+                    <li>• La insignia es permanente una vez activada</li>
+                  </ul>
+                </div>
+                <p className="text-sm text-zinc-600">
+                  Esta acción cuesta <strong>1 token</strong> y no se puede deshacer.
+                </p>
+                <div className="flex gap-3 pt-1">
+                  <Button
+                    variant="outline"
+                    disabled={verificarLoading}
+                    onClick={() => setVerificarModal(null)}
+                    className="flex-1 h-12 rounded-xl border-zinc-200 font-bold"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    disabled={verificarLoading}
+                    onClick={handleVerificarAnuncio}
+                    className="flex-1 h-12 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {verificarLoading ? (
+                      <><Loader2 size={16} className="animate-spin mr-2" />Verificando...</>
+                    ) : (
+                      "Verificar (1 token)"
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
 
     {/* MODAL: Subir anuncio al tope */}
     {subirModal !== null && (

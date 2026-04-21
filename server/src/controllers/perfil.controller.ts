@@ -119,7 +119,7 @@ export const getPerfiles = async (req: Request, res: Response) => {
       const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
       const query = `
-        SELECT id, nombre, foto_principal, telefono, whatsapp, ciudad, barrio, departamento
+        SELECT id, nombre, foto_principal, telefono, whatsapp, ciudad, barrio, departamento, verificado
         FROM perfiles
         ${whereClause}
         ORDER BY created_at DESC
@@ -164,7 +164,7 @@ export const getMisPerfiles = async (req: AuthRequest, res: Response) => {
     }
 
     const result = await pool.query(
-      `SELECT id, nombre, descripcion, foto_principal, ciudad, departamento, barrio, telefono, whatsapp, created_at
+      `SELECT id, nombre, descripcion, foto_principal, ciudad, departamento, barrio, telefono, whatsapp, verificado, created_at
        FROM perfiles
        WHERE usuario_id = $1
        ORDER BY created_at DESC`,
@@ -207,6 +207,62 @@ export const eliminarPerfil = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Error en eliminarPerfil:', error);
     return res.status(500).json({ error: 'Error al eliminar el anuncio.' });
+  }
+};
+
+export const verificarPerfil = async (req: AuthRequest, res: Response) => {
+  const perfilId = parseInt(String(req.params.id), 10);
+  const userId = req.userId;
+
+  if (!userId) return res.status(401).json({ error: 'No autenticado.' });
+  if (isNaN(perfilId)) return res.status(400).json({ error: 'ID inválido.' });
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Lock atómico sobre el saldo del usuario
+    const saldoResult = await client.query(
+      'SELECT saldo_tokens FROM usuarios WHERE id = $1 FOR UPDATE',
+      [userId]
+    );
+    const saldo: number = saldoResult.rows[0]?.saldo_tokens ?? 0;
+    if (saldo < 1) {
+      await client.query('ROLLBACK');
+      return res.status(402).json({ error: 'Saldo insuficiente. Necesitas 1 token para verificar el anuncio.' });
+    }
+
+    // Verificar que el perfil pertenece al usuario y no está ya verificado
+    const perfilResult = await client.query(
+      'SELECT id, verificado FROM perfiles WHERE id = $1 AND usuario_id = $2',
+      [perfilId, userId]
+    );
+    if (!perfilResult.rows.length) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Anuncio no encontrado o no autorizado.' });
+    }
+    if (perfilResult.rows[0].verificado) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({ error: 'Este anuncio ya está verificado.' });
+    }
+
+    // Marcar como verificado
+    await client.query('UPDATE perfiles SET verificado = TRUE WHERE id = $1', [perfilId]);
+
+    // Descontar 1 token
+    await client.query(
+      'UPDATE usuarios SET saldo_tokens = saldo_tokens - 1 WHERE id = $1',
+      [userId]
+    );
+
+    await client.query('COMMIT');
+    return res.status(200).json({ message: 'Anuncio verificado correctamente.' });
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    console.error('Error en verificarPerfil:', error);
+    return res.status(500).json({ error: 'Error al verificar el anuncio.' });
+  } finally {
+    client.release();
   }
 };
 

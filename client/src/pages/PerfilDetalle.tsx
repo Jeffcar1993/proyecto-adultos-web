@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeft, ChevronDown, ChevronUp, ImageIcon, Loader2, MapPin, MessageCircle, Phone } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, ImageIcon, Loader2, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PerfilDetalleData {
@@ -17,6 +17,7 @@ interface PerfilDetalleData {
   whatsapp: string;
   foto_principal: string | null;
   fotos?: unknown;
+  verificado: boolean;
 }
 
 function normalizeFotos(input: unknown, principal: string | null): string[] {
@@ -158,6 +159,13 @@ export function PerfilDetalle() {
 
         <div className="rounded-3xl border border-zinc-200 bg-white p-7 shadow-sm">
           <h1 className="text-3xl font-black uppercase tracking-tight text-zinc-900">{perfil.nombre}</h1>
+
+          {perfil.verificado && (
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-1.5 text-sm font-black text-white shadow-md">
+              <ShieldCheck size={16} />
+              Perfil Verificado
+            </div>
+          )}
 
           <div className="mt-4 flex flex-wrap gap-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">

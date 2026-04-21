@@ -1,7 +1,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
-import { Phone, MessageCircle, MapPin } from "lucide-react";
+import { Phone, MessageCircle, MapPin, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface PerfilCardProps {
@@ -13,6 +13,7 @@ interface PerfilCardProps {
   ciudad?: string;
   departamento?: string;
   barrio?: string;
+  verificado?: boolean;
 }
 
 export function PerfilCard({
@@ -24,6 +25,7 @@ export function PerfilCard({
   ciudad,
   departamento,
   barrio,
+  verificado,
 }: PerfilCardProps) {
   
   const handleWhatsApp = () => {
@@ -50,6 +52,12 @@ export function PerfilCard({
           </AspectRatio>
           {/* Degradado para que el nombre se vea bien */}
           <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
+          {verificado && (
+            <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-blue-600 px-2 py-1 text-[10px] font-black text-white shadow-lg">
+              <ShieldCheck size={12} />
+              Verificado
+            </div>
+          )}
           <div className="absolute bottom-3 left-4 right-4">
             <h3 className="text-xl font-bold uppercase tracking-wider line-clamp-1">{nombre}</h3>
             {(ciudad || departamento) && (

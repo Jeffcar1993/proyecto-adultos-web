@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { crearPerfil, eliminarPerfil, getMisPerfiles, getPerfilById, getPerfiles, subirPerfil } from '../controllers/perfil.controller.ts';
+import { crearPerfil, eliminarPerfil, getMisPerfiles, getPerfilById, getPerfiles, subirPerfil, verificarPerfil } from '../controllers/perfil.controller.ts';
 import { upload } from '../middlewares/multer.ts';
 import { authenticateToken } from '../middlewares/authMiddleware.ts';
 
@@ -14,5 +14,6 @@ router.get('/:id', getPerfilById);
 router.post('/', authenticateToken, upload.array('fotos', 5), crearPerfil);
 router.delete('/:id', authenticateToken, eliminarPerfil);
 router.post('/:id/subir', authenticateToken, subirPerfil);
+router.post('/:id/verificar', authenticateToken, verificarPerfil);
 
 export default router;

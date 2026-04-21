@@ -170,6 +170,24 @@ export async function migratePerfil() {
       console.log("⚠️ No se pudo crear índice barrio:", (error as Error).message);
     }
 
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // 9. Agregar columna verificado
+    try {
+      const checkVerificado = await queryWithRetry(
+        "SELECT column_name FROM information_schema.columns WHERE table_name='perfiles' AND column_name='verificado';"
+      );
+
+      if (checkVerificado.rows.length === 0) {
+        await queryWithRetry(
+          "ALTER TABLE perfiles ADD COLUMN verificado BOOLEAN NOT NULL DEFAULT FALSE;"
+        );
+        changesApplied++;
+      }
+    } catch (error) {
+      console.log("⚠️ No se pudo agregar verificado:", (error as Error).message);
+    }
+
     if (changesApplied > 0) {
       console.log(`✅ Migraciones aplicadas: ${changesApplied}`);
     }

@@ -15,6 +15,7 @@ interface PerfilListado {
   ciudad: string;
   barrio?: string;
   departamento: string;
+  verificado: boolean;
 }
 
 export function TodosPerfiles() {
@@ -197,6 +198,7 @@ export function TodosPerfiles() {
               ciudad={perfil.ciudad}
               barrio={perfil.barrio}
               departamento={perfil.departamento}
+              verificado={perfil.verificado}
             />
           ))}
         </div>
