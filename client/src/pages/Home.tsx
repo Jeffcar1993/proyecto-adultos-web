@@ -112,12 +112,13 @@ export function Home() {
           {/* COLUMNA DERECHA - Logo */}
           <div className="hidden lg:flex justify-center relative">
             {/* Quitamos el div absolute inset-0 que bloqueaba los clics */}
-            <div className="relative group transition-transform duration-500 hover:rotate-3">
+            <div className="relative group transition-transform duration-500 hover:rotate-3 flex flex-col items-center">
               <img
                 src="/logo.png"
                 alt="Erotica"
                 className="h-72 w-auto object-contain drop-shadow-2xl"
               />
+              <span className="mt-3 text-4xl font-black tracking-widest uppercase bg-gradient-to-r from-red-500 via-yellow-400 via-green-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">Colombia</span>
             </div>
           </div>
 
