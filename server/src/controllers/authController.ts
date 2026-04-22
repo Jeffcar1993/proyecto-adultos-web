@@ -20,8 +20,8 @@ export const register = async (req: Request, res: Response) => {
     
     // 2. Guardar en Neon
     const result = await pool.query(
-      'INSERT INTO usuarios (nombre, email, password) VALUES ($1, $2, $3) RETURNING id, nombre, email',
-      [nombre, email, hashedPassword]
+      'INSERT INTO usuarios (nombre, email, password, saldo_tokens) VALUES ($1, $2, $3, $4) RETURNING id, nombre, email',
+      [nombre, email, hashedPassword, 2]
     );
 
     const newUser = result.rows[0];
@@ -220,8 +220,8 @@ export const googleAuth = async (req: Request, res: Response) => {
     if (!user) {
       // Crear nuevo usuario sin contraseña (solo Google)
       const insertResult = await pool.query(
-        'INSERT INTO usuarios (nombre, email, google_id) VALUES ($1, $2, $3) RETURNING id, nombre, email',
-        [name ?? email.split('@')[0], email, googleId]
+        'INSERT INTO usuarios (nombre, email, google_id, saldo_tokens) VALUES ($1, $2, $3, $4) RETURNING id, nombre, email',
+        [name ?? email.split('@')[0], email, googleId, 2]
       );
       user = insertResult.rows[0];
     } else if (!user.google_id) {
