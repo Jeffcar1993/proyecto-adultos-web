@@ -4,9 +4,11 @@ import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, ChevronDown, ChevronUp, ImageIcon, Loader2, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/useAuth";
 
 interface PerfilDetalleData {
   id: number;
+  usuario_id: number;
   nombre: string;
   descripcion: string;
   departamento: string;
@@ -28,6 +30,7 @@ function normalizeFotos(input: unknown, principal: string | null): string[] {
 
 export function PerfilDetalle() {
   const { id } = useParams();
+  const { user } = useAuth();
   const [perfil, setPerfil] = useState<PerfilDetalleData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +80,8 @@ export function PerfilDetalle() {
     if (!perfil?.telefono) return;
     window.open(`tel:${perfil.telefono}`);
   };
+
+  const shouldShowVerificationPrompt = !!perfil && !perfil.verificado && !!user && user.id === perfil.usuario_id;
 
   if (loading) {
     return (
@@ -164,6 +169,12 @@ export function PerfilDetalle() {
             <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-1.5 text-sm font-black text-white shadow-md">
               <ShieldCheck size={16} />
               Perfil Verificado
+            </div>
+          )}
+
+          {shouldShowVerificationPrompt && (
+            <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+              Este anuncio ya es publico. Verificar el perfil da mas confianza y solo cuesta 1 token.
             </div>
           )}
 

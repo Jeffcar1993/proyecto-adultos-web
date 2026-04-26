@@ -3,9 +3,11 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Phone, MessageCircle, MapPin, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/context/useAuth";
 
 interface PerfilCardProps {
   id: string | number;
+  usuarioId?: number;
   nombre: string;
   fotoPrincipal: string;
   telefono: string;
@@ -18,6 +20,7 @@ interface PerfilCardProps {
 
 export function PerfilCard({
   id,
+  usuarioId,
   nombre,
   fotoPrincipal,
   telefono,
@@ -27,6 +30,8 @@ export function PerfilCard({
   barrio,
   verificado,
 }: PerfilCardProps) {
+  const { user } = useAuth();
+  const shouldShowVerificationPrompt = !verificado && !!user && user.id === usuarioId;
   
   const handleWhatsApp = () => {
     // Formatear número para link de WhatsApp
@@ -91,6 +96,12 @@ export function PerfilCard({
           <MessageCircle size={15} />
           <span className="hidden sm:inline text-xs font-semibold">WhatsApp</span>
         </Button>
+
+        {shouldShowVerificationPrompt && (
+          <div className="col-span-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-medium text-amber-800">
+            Verifica este perfil para generar mas confianza. Solo cuesta 1 token.
+          </div>
+        )}
       </CardFooter>
     </Card>
   );

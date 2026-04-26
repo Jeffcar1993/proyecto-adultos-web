@@ -1,5 +1,13 @@
 import { Router } from 'express';
-import { crearPerfil, eliminarPerfil, getMisPerfiles, getPerfilById, getPerfiles, subirPerfil, verificarPerfil } from '../controllers/perfil.controller.ts';
+import {
+	crearPerfil,
+	eliminarPerfil,
+	getMisPerfiles,
+	getPerfilById,
+	getPerfiles,
+	subirPerfil,
+	verificarPerfil,
+} from '../controllers/perfil.controller.ts';
 import { upload } from '../middlewares/multer.ts';
 import { authenticateToken } from '../middlewares/authMiddleware.ts';
 

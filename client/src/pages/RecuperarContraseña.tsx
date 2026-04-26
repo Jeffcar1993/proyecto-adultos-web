@@ -1,9 +1,27 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Mail, Lock, ArrowLeft, Loader2, CheckCircle } from "lucide-react";
+import { Mail, Lock, ArrowLeft, Loader2, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import axios from "axios";
+
+const PASSWORD_REQUIREMENTS = {
+  minLength: 8,
+  hasUppercase: /[A-Z]/,
+  hasLowercase: /[a-z]/,
+  hasNumber: /\d/,
+  hasSpecial: /[^A-Za-z0-9]/,
+};
+
+function isStrongPassword(password: string): boolean {
+  return (
+    password.length >= PASSWORD_REQUIREMENTS.minLength &&
+    PASSWORD_REQUIREMENTS.hasUppercase.test(password) &&
+    PASSWORD_REQUIREMENTS.hasLowercase.test(password) &&
+    PASSWORD_REQUIREMENTS.hasNumber.test(password) &&
+    PASSWORD_REQUIREMENTS.hasSpecial.test(password)
+  );
+}
 
 export function RecuperarContraseña() {
   const navigate = useNavigate();
@@ -15,6 +33,8 @@ export function RecuperarContraseña() {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -62,8 +82,10 @@ export function RecuperarContraseña() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setSubmitError("La contraseña debe tener al menos 6 caracteres.");
+    if (!isStrongPassword(newPassword)) {
+      setSubmitError(
+        "La contraseña debe tener mínimo 8 caracteres, incluyendo mayúscula, minúscula, número y símbolo."
+      );
       return;
     }
 
@@ -264,13 +286,25 @@ export function RecuperarContraseña() {
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
                       <Input
-                        type="password"
+                        type={showNewPassword ? "text" : "password"}
                         value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
+                        onChange={(e) => {
+                          setNewPassword(e.target.value);
+                          if (submitError) setSubmitError(null);
+                        }}
                         required
+                        minLength={8}
                         placeholder="••••••••"
-                        className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 focus:ring-green-600/20"
+                        className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 pr-11 focus:ring-green-600/20"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword((prev) => !prev)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                        aria-label={showNewPassword ? "Ocultar nueva contraseña" : "Mostrar nueva contraseña"}
+                      >
+                        {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
                     </div>
                   </div>
 
@@ -281,23 +315,31 @@ export function RecuperarContraseña() {
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
                       <Input
-                        type="password"
+                        type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                         placeholder="••••••••"
-                        className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 focus:ring-green-600/20"
+                        className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 pr-11 focus:ring-green-600/20"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                        aria-label={showConfirmPassword ? "Ocultar confirmación de contraseña" : "Mostrar confirmación de contraseña"}
+                      >
+                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
                     </div>
                   </div>
 
                   <p className="text-xs text-zinc-500">
-                    La contraseña debe tener al menos 6 caracteres.
+                    Mínimo 8 caracteres con mayúscula, minúscula, número y símbolo.
                   </p>
 
                   <Button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !isStrongPassword(newPassword) || newPassword !== confirmPassword}
                     className="w-full h-12 rounded-xl bg-green-600 text-sm font-bold text-white shadow-lg shadow-green-200 hover:bg-green-700 transition-all disabled:opacity-60"
                   >
                     {loading ? (

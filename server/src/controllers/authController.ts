@@ -7,11 +7,35 @@ import pool from '../config/db.ts';
 import type { AuthRequest } from '../middlewares/authMiddleware.ts';
 import { sendResetPasswordEmail } from '../services/emailService.ts';
 
+const PASSWORD_RULES = {
+  minLength: 8,
+  hasUppercase: /[A-Z]/,
+  hasLowercase: /[a-z]/,
+  hasNumber: /\d/,
+  hasSpecial: /[^A-Za-z0-9]/,
+};
+
+function isStrongPassword(password: string): boolean {
+  return (
+    password.length >= PASSWORD_RULES.minLength &&
+    PASSWORD_RULES.hasUppercase.test(password) &&
+    PASSWORD_RULES.hasLowercase.test(password) &&
+    PASSWORD_RULES.hasNumber.test(password) &&
+    PASSWORD_RULES.hasSpecial.test(password)
+  );
+}
+
 export const register = async (req: Request, res: Response) => {
   const { nombre, email, password } = req.body;
 
   if (!nombre || !email || !password) {
     return res.status(400).json({ error: 'Nombre, correo y contraseña son obligatorios.' });
+  }
+
+  if (typeof password !== 'string' || !isStrongPassword(password)) {
+    return res.status(400).json({
+      error: 'La contraseña debe tener mínimo 8 caracteres, incluyendo mayúscula, minúscula, número y símbolo.',
+    });
   }
 
   try {
@@ -132,8 +156,10 @@ export const resetPassword = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Token y nueva contraseña son obligatorios.' });
   }
 
-  if (typeof newPassword !== 'string' || newPassword.length < 6) {
-    return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+  if (typeof newPassword !== 'string' || !isStrongPassword(newPassword)) {
+    return res.status(400).json({
+      error: 'La contraseña debe tener mínimo 8 caracteres, incluyendo mayúscula, minúscula, número y símbolo.',
+    });
   }
 
   try {

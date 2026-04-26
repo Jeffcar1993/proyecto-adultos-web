@@ -397,10 +397,16 @@ export function FormularioPerfil() {
                 name="telefono"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                      Teléfono
+                    </FormLabel>
                     <FormControl>
                       <Input
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel-national"
                         className="rounded-xl bg-zinc-50 border-none h-12 focus:ring-2 focus:ring-blue-600/10"
-                        placeholder="Teléfono"
+                        placeholder="Ej. 3001234567"
                         {...field}
                       />
                     </FormControl>
@@ -413,13 +419,22 @@ export function FormularioPerfil() {
                 name="whatsapp"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                      WhatsApp
+                    </FormLabel>
                     <FormControl>
                       <Input
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="off"
                         className="rounded-xl bg-zinc-50 border-none h-12 focus:ring-2 focus:ring-blue-600/10"
-                        placeholder="WhatsApp (con código de país)"
+                        placeholder="Ej. 573001234567"
                         {...field}
                       />
                     </FormControl>
+                    <p className="text-xs text-zinc-500">
+                      Ingresa el número completo de WhatsApp con código de país. Ejemplo: 57...
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}

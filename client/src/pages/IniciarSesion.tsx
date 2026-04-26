@@ -1,5 +1,5 @@
 import { Link, useNavigate, } from "react-router-dom";
-import { ShieldCheck, Lock, Mail, ArrowLeft } from "lucide-react";
+import { ShieldCheck, Lock, Mail, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/useAuth";
@@ -13,6 +13,7 @@ export function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -104,13 +105,21 @@ export function Login() {
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
                 <Input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   value={password} 
                   onChange={(e) => setPassword(e.target.value)} 
                   required 
                   placeholder="••••••••" 
-                  className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 focus:ring-blue-600/20"
+                  className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pl-11 pr-11 focus:ring-blue-600/20"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 

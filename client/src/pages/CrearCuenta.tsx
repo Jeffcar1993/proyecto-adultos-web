@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,24 @@ import { useAuth } from "@/context/useAuth";
 import { useState } from "react";
 import axios from "axios";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+
+const PASSWORD_REQUIREMENTS = {
+  minLength: 8,
+  hasUppercase: /[A-Z]/,
+  hasLowercase: /[a-z]/,
+  hasNumber: /\d/,
+  hasSpecial: /[^A-Za-z0-9]/,
+};
+
+function isStrongPassword(password: string): boolean {
+  return (
+    password.length >= PASSWORD_REQUIREMENTS.minLength &&
+    PASSWORD_REQUIREMENTS.hasUppercase.test(password) &&
+    PASSWORD_REQUIREMENTS.hasLowercase.test(password) &&
+    PASSWORD_REQUIREMENTS.hasNumber.test(password) &&
+    PASSWORD_REQUIREMENTS.hasSpecial.test(password)
+  );
+}
 
 export function CrearCuenta() {
   const navigate = useNavigate(); // Inicializar
@@ -16,11 +34,20 @@ export function CrearCuenta() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleRegistro = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isStrongPassword(password)) {
+      setSubmitError(
+        "La contraseña debe tener mínimo 8 caracteres, incluyendo mayúscula, minúscula, número y símbolo."
+      );
+      return;
+    }
+
     setLoading(true);
     setSubmitError(null);
     
@@ -103,10 +130,38 @@ export function CrearCuenta() {
 
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Contraseña</label>
-                <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" className="h-12 rounded-xl border-zinc-200 bg-zinc-50 focus:ring-blue-600/10" />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (submitError) setSubmitError(null);
+                    }}
+                    required
+                    minLength={8}
+                    placeholder="••••••••"
+                    className="h-12 rounded-xl border-zinc-200 bg-zinc-50 pr-11 focus:ring-blue-600/10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <p className="text-[11px] text-zinc-500">
+                  Mínimo 8 caracteres con mayúscula, minúscula, número y símbolo.
+                </p>
               </div>
 
-              <Button type="submit" disabled={loading} className="text-white w-full h-14 rounded-xl bg-blue-600 text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer">
+              <Button
+                type="submit"
+                disabled={loading || !isStrongPassword(password)}
+                className="text-white w-full h-14 rounded-xl bg-blue-600 text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer"
+              >
                 {loading ? "Creando cuenta..." : "Crear Mi Cuenta"}
               </Button>
 

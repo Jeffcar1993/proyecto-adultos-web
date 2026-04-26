@@ -119,7 +119,7 @@ export const getPerfiles = async (req: Request, res: Response) => {
       const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
       const query = `
-        SELECT id, nombre, foto_principal, telefono, whatsapp, ciudad, barrio, departamento, verificado
+        SELECT id, usuario_id, nombre, foto_principal, telefono, whatsapp, ciudad, barrio, departamento, verificado
         FROM perfiles
         ${whereClause}
         ORDER BY created_at DESC

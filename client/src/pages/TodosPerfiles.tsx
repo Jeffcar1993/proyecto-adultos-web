@@ -8,6 +8,7 @@ import colombiaData from "@/data/colombia.json";
 
 interface PerfilListado {
   id: string;
+  usuario_id: number;
   nombre: string;
   foto_principal: string;
   telefono: string;
@@ -191,6 +192,7 @@ export function TodosPerfiles() {
             <PerfilCard
               key={perfil.id}
               id={perfil.id}
+              usuarioId={perfil.usuario_id}
               nombre={perfil.nombre}
               fotoPrincipal={perfil.foto_principal}
               telefono={perfil.telefono}
