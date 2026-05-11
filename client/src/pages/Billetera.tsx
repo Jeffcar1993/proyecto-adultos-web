@@ -26,7 +26,7 @@ interface BilleteraData {
   historial: OrdenHistorial[];
 }
 
-const NEQUI_NUMBER = "300 000 0000"; // ← Cambia este número por el tuyo
+const WOMPI_CHECKOUT_URL = "https://checkout.wompi.co/l/test_VPOS_QmgEvW";
 
 const PACK_BADGES: Record<string, string> = {
   "Pack Básico": "bg-zinc-800 text-zinc-100",
@@ -273,13 +273,13 @@ export function Billetera() {
       {/* MODAL DE COMPRA */}
       {selectedPack && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-3 pt-6 backdrop-blur-sm sm:items-center sm:p-4"
           onClick={(e) => e.target === e.currentTarget && closeModal()}
         >
-          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+          <div className="relative w-full max-w-xs max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-4 shadow-2xl sm:max-w-sm sm:max-h-[80vh] sm:p-5">
             <button
               onClick={closeModal}
-              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600"
+              className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-700 shadow-sm transition-colors hover:bg-zinc-100 sm:right-4 sm:top-4"
               aria-label="Cerrar"
             >
               <X size={16} />
@@ -298,23 +298,42 @@ export function Billetera() {
               </div>
             ) : (
               <>
-                <h3 className="mb-1 text-xl font-black text-zinc-900">{selectedPack.nombre}</h3>
-                <p className="mb-5 text-sm text-zinc-500">
+                <h3 className="mb-1 pr-10 text-lg font-black text-zinc-900 sm:text-xl">{selectedPack.nombre}</h3>
+                <p className="mb-4 text-xs text-zinc-500 sm:mb-5 sm:text-sm">
                   {selectedPack.cantidad_tokens} tokens · {formatCOP(selectedPack.precio_cop)}
                 </p>
 
-                {/* Instrucciones de pago */}
-                <div className="mb-5 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 space-y-1">
-                  <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Pagar por Nequi</p>
-                  <p className="text-2xl font-black text-zinc-900 tracking-widest">{NEQUI_NUMBER}</p>
-                  <p className="text-xs text-zinc-500">
-                    Envía exactamente <strong>{formatCOP(selectedPack.precio_cop)}</strong> a este número.
-                    Luego sube el pantallazo.
+                {/* Pago online con enlace */}
+                <div className="mb-4 rounded-2xl bg-emerald-50 border border-emerald-200 p-3 space-y-2 sm:mb-5 sm:p-4">
+                  <p className="text-xs font-black uppercase tracking-widest text-emerald-700">Pagar online</p>
+                  <p className="text-xs text-emerald-800">
+                    Puedes pagar este pack por Wompi (tarjeta, PSE y otros métodos).
                   </p>
+                  <a
+                    href={WOMPI_CHECKOUT_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex h-9 w-full items-center justify-center rounded-xl bg-emerald-600 px-4 text-xs font-bold text-white transition-colors hover:bg-emerald-700 sm:h-10 sm:text-sm"
+                  >
+                    Pagar {selectedPack.nombre} en Wompi
+                  </a>
+                </div>
+
+                {/* Pago por QR */}
+                <div className="mb-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-3 sm:mb-5 sm:p-4">
+                  <p className="mb-2 text-xs font-black uppercase tracking-widest text-zinc-500">Pagar por QR</p>
+                  <p className="mb-3 text-xs text-zinc-500">
+                    Escanea este QR para realizar el pago y luego sube tu comprobante.
+                  </p>
+                  <img
+                    src="/qr.png"
+                    alt="Código QR para pago"
+                    className="mx-auto w-36 rounded-xl border border-zinc-200 bg-white p-2 sm:w-44"
+                  />
                 </div>
 
                 {/* Upload comprobante */}
-                <div className="mb-5">
+                <div className="mb-4 sm:mb-5">
                   <p className="mb-2 text-xs font-bold uppercase tracking-widest text-zinc-500">Pantallazo del pago</p>
                   {previewUrl ? (
                     <div className="relative">
@@ -366,6 +385,12 @@ export function Billetera() {
                 <p className="mt-3 text-center text-[11px] text-zinc-400">
                   Puedes enviar el comprobante después si aún estás pagando.
                 </p>
+                <button
+                  onClick={closeModal}
+                  className="mt-3 w-full text-center text-xs font-bold text-zinc-500 underline underline-offset-2 hover:text-zinc-700"
+                >
+                  Cerrar ventana
+                </button>
               </>
             )}
           </div>
