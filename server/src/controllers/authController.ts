@@ -164,10 +164,21 @@ export const resetPassword = async (req: Request, res: Response) => {
   }
 
   try {
+    // Optimización: Filtrar solo tokens válidos (no expirados) usando el índice
+    // Esto reduce significativamente la cantidad de registros a iterar
     const userResult = await pool.query(
-      'SELECT id, reset_token, reset_token_expires FROM usuarios WHERE reset_token IS NOT NULL',
+      `SELECT id, reset_token, reset_token_expires 
+       FROM usuarios 
+       WHERE reset_token IS NOT NULL 
+       AND reset_token_expires > NOW()
+       ORDER BY reset_token_expires DESC
+       LIMIT 100`,
       []
     );
+
+    if (userResult.rows.length === 0) {
+      return res.status(400).json({ error: 'Token inválido o expirado.' });
+    }
 
     // Buscar el usuario cuyo hash coincide con el token recibido
     let matchedUser: { id: number; reset_token: string; reset_token_expires: Date } | null = null;
@@ -180,10 +191,6 @@ export const resetPassword = async (req: Request, res: Response) => {
 
     if (!matchedUser) {
       return res.status(400).json({ error: 'Token inválido.' });
-    }
-
-    if (new Date() > new Date(matchedUser.reset_token_expires)) {
-      return res.status(400).json({ error: 'El enlace ha expirado. Solicita uno nuevo.' });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -200,7 +207,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 };
 
 export const googleAuth = async (req: Request, res: Response) => {
-  const { credential } = req.body;
+  const credential = req.body?.credential ?? req.body?.idToken;
 
   if (!credential) {
     return res.status(400).json({ error: 'Token de Google no proporcionado.' });

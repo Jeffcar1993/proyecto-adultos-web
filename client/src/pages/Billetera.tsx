@@ -26,7 +26,7 @@ interface BilleteraData {
   historial: OrdenHistorial[];
 }
 
-const WOMPI_CHECKOUT_URL = "https://checkout.wompi.co/l/test_VPOS_QmgEvW";
+const WOMPI_CHECKOUT_URL = import.meta.env.VITE_WOMPI_CHECKOUT_URL || "https://checkout.wompi.co/l/prod_VPOS_PLACEHOLDER";
 
 const PACK_BADGES: Record<string, string> = {
   "Pack Básico": "bg-zinc-800 text-zinc-100",

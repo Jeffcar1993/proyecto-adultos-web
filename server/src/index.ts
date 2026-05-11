@@ -1,16 +1,54 @@
 import express from 'express';
 import cors from 'cors';
 import pool from './config/db.ts';
-import { migratePerfil, migrateUsuarios, migrateTokens } from './config/migrations.ts';
 import perfilRoutes from './routes/perfil.routes.ts';
 import authRoutes from './routes/auth.routes.ts';
 import tokensRoutes from './routes/tokens.routes.ts';
+import { generalLimiter, authLimiter, passwordResetLimiter } from './middlewares/rateLimiter.ts';
 
 const app = express();
-app.use(cors());
+
+const normalizeOrigin = (origin: string) => origin.replace(/\/+$/, '');
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => normalizeOrigin(origin.trim()))
+  .filter(Boolean);
+
+// Configuración CORS restrictiva
+const corsOptions = {
+  origin: (requestOrigin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) => {
+    if (!requestOrigin) {
+      return callback(null, true);
+    }
+
+    const normalizedRequestOrigin = normalizeOrigin(requestOrigin);
+    const isAllowed = allowedOrigins.includes(normalizedRequestOrigin);
+
+    if (isAllowed) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origen no permitido por CORS: ${requestOrigin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400, // 24 horas
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// Rutas
+// Rate limiting global
+app.use(generalLimiter);
+
+// Rutas con limitadores específicos
+app.post('/api/register', authLimiter);
+app.post('/api/login', authLimiter);
+app.post('/api/forgot-password', passwordResetLimiter);
+app.post('/api/reset-password', authLimiter);
+app.post('/api/auth/google', authLimiter);
+
 app.use('/api', authRoutes);
 app.use('/api', tokensRoutes);
 app.use('/api/perfiles', perfilRoutes);
@@ -29,16 +67,8 @@ app.get('/test-db', async (req, res) => {
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log('📝 Nota: Para ejecutar migraciones, usa: npm run migrate');
 });
-
-// Intentar migración con manejo de errores
-migrateUsuarios()
-  .then(() => migratePerfil())
-  .then(() => migrateTokens())
-  .then(() => undefined)
-  .catch((error) => {
-    console.error('⚠️ Error en migración (continuando):', error.message);
-  });
 
 // Manejo de errores no capturados
 process.on('unhandledRejection', (err) => {

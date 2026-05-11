@@ -249,6 +249,20 @@ export async function migrateUsuarios() {
       changesApplied++;
     }
 
+    // Crear índice en reset_token_expires para optimizar búsquedas de password reset
+    try {
+      const indexExists = await queryWithRetry(
+        "SELECT 1 FROM information_schema.statistics WHERE table_name='usuarios' AND index_name='idx_reset_token_expires';"
+      ).catch(() => ({ rows: [] })); // Si falla, continuar
+
+      if (indexExists.rows.length === 0) {
+        await queryWithRetry("CREATE INDEX IF NOT EXISTS idx_reset_token_expires ON usuarios(reset_token_expires DESC);");
+        changesApplied++;
+      }
+    } catch (err) {
+      console.warn('⚠️ No se pudo crear índice reset_token_expires (continuando):', err);
+    }
+
     if (changesApplied > 0) {
       console.log(`✅ Migración usuarios aplicada: ${changesApplied}`);
     }

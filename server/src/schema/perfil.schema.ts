@@ -5,22 +5,40 @@ export const CreatePerfilSchema = z.object({
     nombre: z
       .string()
       .min(3, "El nombre debe tener al menos 3 caracteres")
-      .max(100),
+      .max(100, "El nombre no puede exceder 100 caracteres"),
     
     descripcion: z
       .string()
       .max(500, "La descripción no puede exceder los 500 caracteres")
       .optional(),
     
+    departamento: z
+      .string()
+      .min(2, "El departamento es requerido")
+      .max(100),
+    
+    ciudad: z
+      .string()
+      .min(2, "La ciudad es requerida")
+      .max(100),
+    
+    barrio: z
+      .string()
+      .min(2, "El barrio es requerido")
+      .max(100)
+      .optional(),
+    
     telefono: z
       .string()
+      .regex(/^[\d+\-\s()]+$/, "Teléfono inválido")
       .min(7, "El teléfono es demasiado corto")
-      .max(20),
+      .max(20, "El teléfono es demasiado largo"),
     
     whatsapp: z
       .string()
-      .min(7)
-      .max(20)
+      .regex(/^[\d+\-\s()]+$/, "WhatsApp inválido")
+      .min(7, "WhatsApp demasiado corto")
+      .max(20, "WhatsApp demasiado largo")
       .optional(),
 
     edad: z
@@ -30,18 +48,36 @@ export const CreatePerfilSchema = z.object({
       .min(18, "Debes ser mayor de 18 años")
       .max(99, "Edad inválida")
       .optional(),
-    
-    // Validamos que el array de fotos tenga contenido y no se pase de 5
-    fotos: z
-      .array(z.string().url("Cada foto debe ser una URL válida"))
-      .min(1, "Debes subir al menos una foto")
-      .max(5, "El máximo de fotos permitido es 5"),
-    
-    foto_principal: z
-      .string()
-      .url("La foto principal debe ser una URL válida")
   })
 });
 
-// Esto nos servirá para tipar TypeScript automáticamente basado en el esquema
+export const VerifyPerfilSchema = z.object({
+  params: z.object({
+    id: z.string().regex(/^\d+$/, "ID debe ser numérico")
+  })
+});
+
+export const UploadPerfilSchema = z.object({
+  params: z.object({
+    id: z.string().regex(/^\d+$/, "ID debe ser numérico")
+  })
+});
+
+export const DeletePerfilSchema = z.object({
+  params: z.object({
+    id: z.string().regex(/^\d+$/, "ID debe ser numérico")
+  })
+});
+
+export const GetPerfilSchema = z.object({
+  params: z.object({
+    id: z.string().regex(/^\d+$/, "ID debe ser numérico")
+  })
+});
+
+// Type inference
 export type CreatePerfilInput = z.infer<typeof CreatePerfilSchema>['body'];
+export type VerifyPerfilInput = z.infer<typeof VerifyPerfilSchema>;
+export type UploadPerfilInput = z.infer<typeof UploadPerfilSchema>;
+export type DeletePerfilInput = z.infer<typeof DeletePerfilSchema>;
+export type GetPerfilInput = z.infer<typeof GetPerfilSchema>;
