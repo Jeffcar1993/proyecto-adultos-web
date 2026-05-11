@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import https from 'https';
 import pool from '../config/db.ts';
+import { jwtSecret } from '../config/jwt.ts';
 import type { AuthRequest } from '../middlewares/authMiddleware.ts';
 import { sendResetPasswordEmail } from '../services/emailService.ts';
 
@@ -51,7 +52,7 @@ export const register = async (req: Request, res: Response) => {
     const newUser = result.rows[0];
     const token = jwt.sign(
       { userId: newUser.id, email: newUser.email },
-      process.env.JWT_SECRET || 'secret_key_provisoria',
+      jwtSecret,
       { expiresIn: '24h' }
     );
 
@@ -78,7 +79,7 @@ export const login = async (req: Request, res: Response) => {
     // 3. Generar el Token (JWT)
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'secret_key_provisoria',
+      jwtSecret,
       { expiresIn: '24h' }
     );
 
@@ -257,7 +258,7 @@ export const googleAuth = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'secret_key_provisoria',
+      jwtSecret,
       { expiresIn: '24h' }
     );
 
