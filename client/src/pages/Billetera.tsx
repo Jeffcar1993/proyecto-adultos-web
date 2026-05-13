@@ -26,7 +26,9 @@ interface BilleteraData {
   historial: OrdenHistorial[];
 }
 
-const WOMPI_CHECKOUT_URL = import.meta.env.VITE_WOMPI_CHECKOUT_URL || "https://checkout.wompi.co/l/prod_VPOS_PLACEHOLDER";
+const WOMPI_CHECKOUT_URL = "https://checkout.wompi.co/l/VPOS_6EJ08x";
+
+import qr1 from "@/img/qr1.png";
 
 const PACK_BADGES: Record<string, string> = {
   "Pack Básico": "bg-zinc-800 text-zinc-100",
@@ -326,7 +328,7 @@ export function Billetera() {
                     Escanea este QR para realizar el pago y luego sube tu comprobante.
                   </p>
                   <img
-                    src="/qr.png"
+                    src={qr1}
                     alt="Código QR para pago"
                     className="mx-auto w-36 rounded-xl border border-zinc-200 bg-white p-2 sm:w-44"
                   />
