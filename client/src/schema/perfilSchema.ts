@@ -13,7 +13,7 @@ export const perfilSchema = z.object({
   telefono: z.string().min(7, "Teléfono inválido"),
   whatsapp: z.string().min(7, "WhatsApp inválido"),
   edad: z
-    .number({ invalid_type_error: "Ingresa una edad válida" })
+    .number({ error: "Ingresa una edad válida" })
     .int()
     .min(18, "Debes ser mayor de 18 años")
     .max(99, "Edad inválida")
