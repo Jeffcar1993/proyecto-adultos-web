@@ -1,6 +1,6 @@
 import type { Response, NextFunction } from 'express';
-import type { AuthRequest } from './authMiddleware.ts';
-import pool from '../config/db.ts';
+import type { AuthRequest } from './authMiddleware.js';
+import pool from '../config/db.js';
 
 // Cache en memoria para roles de admin (TTL: 5 minutos)
 const adminCache = new Map<number, { isAdmin: boolean; timestamp: number }>();

@@ -7,16 +7,16 @@ import {
 	resetPassword,
 	googleAuth,
 	deleteAccount
-} from '../controllers/authController.ts';
-import { authenticateToken } from '../middlewares/authMiddleware.ts';
-import { validateResource } from '../middlewares/validateResource.ts';
+} from '../controllers/authController.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
+import { validateResource } from '../middlewares/validateResource.js';
 import {
 	RegisterSchema,
 	LoginSchema,
 	RequestPasswordResetSchema,
 	ResetPasswordSchema,
 	GoogleAuthSchema,
-} from '../schema/auth.schema.ts';
+} from '../schema/auth.schema.js';
 
 const router = Router();
 

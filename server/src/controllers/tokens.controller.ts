@@ -1,7 +1,7 @@
 import type { Response } from 'express';
-import type { AuthRequest } from '../middlewares/authMiddleware.ts';
-import pool from '../config/db.ts';
-import { uploadToCloudinary } from '../config/cloudinary.ts';
+import type { AuthRequest } from '../middlewares/authMiddleware.js';
+import pool from '../config/db.js';
+import { uploadToCloudinary } from '../config/cloudinary.js';
 
 // ─────────────────────────────────────────────
 // GET /api/tokens/paquetes  (público)

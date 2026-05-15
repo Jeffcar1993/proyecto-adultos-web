@@ -1,4 +1,4 @@
-import pool from '../config/db.ts';
+import pool from '../config/db.js';
 
 // Función auxiliar para hacer reintentos en conexiones
 async function queryWithRetry(queryStr: string, params: unknown[] = [], retries = 3) {

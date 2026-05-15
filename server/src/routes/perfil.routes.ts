@@ -7,17 +7,17 @@ import {
 	getPerfiles,
 	subirPerfil,
 	verificarPerfil,
-} from '../controllers/perfil.controller.ts';
-import { upload } from '../middlewares/multer.ts';
-import { authenticateToken } from '../middlewares/authMiddleware.ts';
-import { validateResource } from '../middlewares/validateResource.ts';
+} from '../controllers/perfil.controller.js';
+import { upload } from '../middlewares/multer.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
+import { validateResource } from '../middlewares/validateResource.js';
 import {
 	CreatePerfilSchema,
 	VerifyPerfilSchema,
 	UploadPerfilSchema,
 	DeletePerfilSchema,
 	GetPerfilSchema,
-} from '../schema/perfil.schema.ts';
+} from '../schema/perfil.schema.js';
 
 const router = Router();
 

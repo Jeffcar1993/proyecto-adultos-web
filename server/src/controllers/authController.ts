@@ -3,10 +3,10 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import https from 'https';
-import pool from '../config/db.ts';
-import { jwtSecret } from '../config/jwt.ts';
-import type { AuthRequest } from '../middlewares/authMiddleware.ts';
-import { sendResetPasswordEmail } from '../services/emailService.ts';
+import pool from '../config/db.js';
+import { jwtSecret } from '../config/jwt.js';
+import type { AuthRequest } from '../middlewares/authMiddleware.js';
+import { sendResetPasswordEmail } from '../services/emailService.js';
 
 const PASSWORD_RULES = {
   minLength: 8,

@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import pool from './config/db.ts';
-import perfilRoutes from './routes/perfil.routes.ts';
-import authRoutes from './routes/auth.routes.ts';
-import tokensRoutes from './routes/tokens.routes.ts';
-import { generalLimiter, authLimiter, passwordResetLimiter } from './middlewares/rateLimiter.ts';
+import pool from './config/db.js';
+import perfilRoutes from './routes/perfil.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import tokensRoutes from './routes/tokens.routes.js';
+import { generalLimiter, authLimiter, passwordResetLimiter } from './middlewares/rateLimiter.js';
 
 const app = express();
 

@@ -1,4 +1,4 @@
-import { migrateUsuarios, migratePerfil, migrateTokens } from '../config/migrations.ts';
+import { migrateUsuarios, migratePerfil, migrateTokens } from '../config/migrations.js';
 
 async function runMigrations() {
   console.log('🔄 Iniciando migraciones...');

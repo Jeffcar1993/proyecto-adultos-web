@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import pool from '../config/db.ts';
-import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary.ts';
-import type { AuthRequest } from '../middlewares/authMiddleware.ts';
+import pool from '../config/db.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary.js';
+import type { AuthRequest } from '../middlewares/authMiddleware.js';
 
 export const crearPerfil = async (req: AuthRequest, res: Response) => {
   const { nombre, descripcion, departamento, ciudad, barrio, telefono, whatsapp, edad } = req.body;

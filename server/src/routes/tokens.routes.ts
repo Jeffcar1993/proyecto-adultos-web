@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { authenticateToken } from '../middlewares/authMiddleware.ts';
-import { adminMiddleware } from '../middlewares/adminMiddleware.ts';
-import { upload } from '../middlewares/multer.ts';
-import { validateResource } from '../middlewares/validateResource.ts';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
+import { adminMiddleware } from '../middlewares/adminMiddleware.js';
+import { upload } from '../middlewares/multer.js';
+import { validateResource } from '../middlewares/validateResource.js';
 import {
   getPaquetes,
   getBilletera,
@@ -10,12 +10,12 @@ import {
   getOrdenesPendientes,
   aprobarOrden,
   rechazarOrden,
-} from '../controllers/tokens.controller.ts';
+} from '../controllers/tokens.controller.js';
 import {
   ApproveOrdenSchema,
   RejectOrdenSchema,
   CreateOrdenSchema,
-} from '../schema/tokens.schema.ts';
+} from '../schema/tokens.schema.js';
 
 const router = Router();
 
