@@ -9,6 +9,9 @@ export function SiteHeader() {
   const { token, user, logout } = useAuth()
   const navigate = useNavigate()
 
+  const mobileActionBaseClass =
+    "md:hidden inline-flex h-10 items-center justify-center gap-2 rounded-full px-3 text-xs font-semibold tracking-tight transition-colors"
+
   const handleLogout = () => {
     logout()
     navigate("/")
@@ -60,17 +63,19 @@ export function SiteHeader() {
                 {/* Móvil */}
                 <Link
                   to="/iniciar-sesion"
-                  className="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-700 hover:bg-zinc-50"
+                  className={`${mobileActionBaseClass} border border-zinc-200 text-zinc-700 hover:bg-zinc-50`}
                   aria-label="Iniciar sesión"
                 >
-                  <LogIn size={18} />
+                  <LogIn size={15} />
+                  <span>Ingresar</span>
                 </Link>
                 <Link
                   to="/crear-cuenta"
-                  className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white shadow-md shadow-blue-200"
+                  className={`${mobileActionBaseClass} bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700`}
                   aria-label="Crear cuenta"
                 >
-                  <UserPlus size={18} />
+                  <UserPlus size={15} />
+                  <span>Crear cuenta</span>
                 </Link>
               </>
             ) : (
@@ -117,21 +122,23 @@ export function SiteHeader() {
                 )}
                 <Link
                   to="/billetera"
-                  className="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-700 hover:bg-zinc-50"
+                  className={`${mobileActionBaseClass} h-11 px-4 text-sm border border-zinc-200 text-zinc-700 hover:bg-zinc-50`}
                   aria-label="Billetera"
                 >
-                  <Coins size={18} />
+                  <Coins size={16} />
+                  <span>Billetera</span>
                 </Link>
                 <Link
                   to="/mi-perfil"
-                  className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white shadow-md shadow-blue-200"
+                  className={`${mobileActionBaseClass} h-11 px-4 text-sm bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700`}
                   aria-label="Mi perfil"
                 >
-                  <UserCircle size={20} />
+                  <UserCircle size={16} />
+                  <span>Mi perfil</span>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-white"
+                  className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full bg-red-600 text-white transition-colors hover:bg-red-700"
                   aria-label="Cerrar sesión"
                 >
                   <LogOut size={18} />
