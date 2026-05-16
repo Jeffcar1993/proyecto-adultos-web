@@ -8,6 +8,8 @@ import { generalLimiter, authLimiter, passwordResetLimiter } from './middlewares
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 const normalizeOrigin = (origin: string) => origin.replace(/\/+$/, '');
 const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
   .split(',')
