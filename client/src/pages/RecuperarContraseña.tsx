@@ -105,6 +105,7 @@ export function RecuperarContraseña() {
       await axios.post(`${import.meta.env.VITE_API_URL}/reset-password`, {
         token,
         newPassword,
+        confirmPassword,
       });
 
       setSuccessMessage("Tu contraseña ha sido actualizada exitosamente.");
