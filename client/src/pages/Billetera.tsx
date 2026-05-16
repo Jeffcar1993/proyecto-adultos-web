@@ -146,7 +146,6 @@ export function Billetera() {
       await axios.post(`${apiUrl}/tokens/comprar`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
         },
       });
 
